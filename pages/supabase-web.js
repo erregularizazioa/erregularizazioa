@@ -5,6 +5,7 @@
   var privateApp = document.getElementById("private-app");
   var loginForm = document.getElementById("login-form");
   var loginEmail = document.getElementById("login-email");
+  var loginPassword = document.getElementById("login-password");
   var loginMessage = document.getElementById("login-message");
   var userBar = document.getElementById("private-userbar");
   var currentUserEmail = document.getElementById("current-user-email");
@@ -141,7 +142,7 @@
       var session = await getSession();
       setLoggedInState(session);
       if (!session) {
-        setAuthMessage("Inicia sesion con un correo invitado para abrir el area privada.", "info");
+        setAuthMessage("Inicia sesion con tu correo y contrasena para abrir el area privada.", "info");
       } else {
         setAuthMessage("", "info");
       }
@@ -157,22 +158,23 @@
       setAuthMessage("", "info");
 
       var email = String(loginEmail && loginEmail.value || "").trim();
+      var password = String(loginPassword && loginPassword.value || "");
       if (!email) {
         setAuthMessage("Escribe un correo autorizado.", "error");
         return;
       }
+      if (!password) {
+        setAuthMessage("Escribe la contrasena.", "error");
+        return;
+      }
 
       try {
-        var redirectUrl = window.location.origin + window.location.pathname;
-        var result = await supabaseClient.auth.signInWithOtp({
+        var result = await supabaseClient.auth.signInWithPassword({
           email: email,
-          options: {
-            emailRedirectTo: redirectUrl,
-            shouldCreateUser: false
-          }
+          password: password
         });
         if (result.error) throw result.error;
-        setAuthMessage("Hemos enviado un enlace de acceso a tu correo.", "success");
+        setAuthMessage("", "info");
       } catch (error) {
         setAuthMessage(error.message, "error");
       }
@@ -189,7 +191,7 @@
   supabaseClient.auth.onAuthStateChange(function(event, session) {
     setLoggedInState(session || null);
     if (!session) {
-      setAuthMessage("Inicia sesion con un correo invitado para abrir el area privada.", "info");
+      setAuthMessage("Inicia sesion con tu correo y contrasena para abrir el area privada.", "info");
     }
   });
 

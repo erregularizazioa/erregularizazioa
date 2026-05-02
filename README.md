@@ -67,15 +67,9 @@ https://joanesplazaola.github.io/erregularizazioa/private.html
 ### Configuracion de Supabase para el area privada
 
 1. En Supabase, ejecuta `supabase/schema.sql` en el SQL editor.
-2. En **Authentication → Providers → Email**, deja activo el acceso por email.
-3. En **Authentication → URL Configuration**, añade como redirect URL:
-
-```text
-https://joanesplazaola.github.io/erregularizazioa/private.html
-```
-
-4. En **Authentication → Users**, invita manualmente a las personas del equipo.
-5. Los datos del cliente web viven en `pages/config.js`.
+2. En **Authentication → Providers → Email**, deja activo **Email + password**.
+3. En **Authentication → Users**, crea manualmente las 2-3 personas del equipo y define su contraseña.
+4. Los datos del cliente web viven en `pages/config.js`.
 
 Con la configuracion actual, solo las personas autenticadas pueden leer y escribir casos en la tabla compartida.
 
