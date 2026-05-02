@@ -1,0 +1,729 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #5a6476;
+  --primary: #1141c1;
+  --primary-soft: #dce7ff;
+  --border: #d8deea;
+  --ok: #14532d;
+  --ok-bg: #dcfce7;
+  --warn: #9a3412;
+  --warn-bg: #ffedd5;
+  --stop: #991b1b;
+  --stop-bg: #fee2e2;
+  --info: #0c4a6e;
+  --info-bg: #e0f2fe;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--primary);
+}
+
+.layout {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.hero {
+  margin-bottom: 16px;
+}
+
+#runtime-mode-message {
+  margin-top: 16px;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.lang-toggle {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.lang-btn {
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lang-btn:hover {
+  background: var(--primary-light);
+}
+
+.lang-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.id-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  min-width: 120px;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+h1,
+h2,
+h3,
+legend {
+  line-height: 1.2;
+}
+
+.intro {
+  max-width: 72ch;
+  font-size: 1.1rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(23, 32, 51, 0.05);
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.toolbar,
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.form-grid,
+.field-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.field-grid.two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guidance-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guidance-diagnosis {
+  grid-column: 1 / -1;
+}
+
+.subpanel {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  background: #fbfcff;
+}
+
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+label,
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.choice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 1rem;
+}
+
+.choice input[type="radio"],
+.choice input[type="checkbox"] {
+  margin-top: 0.2rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="search"],
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--text);
+  background: #fff;
+}
+
+input[readonly] {
+  background: #f8fafc;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 14px 20px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+button:hover,
+button:focus-visible,
+a:hover,
+a:focus-visible {
+  filter: brightness(0.96);
+}
+
+.simple-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.note {
+  color: var(--muted);
+}
+
+.hidden {
+  display: none;
+}
+
+/* ── Status pill bar ─────────────────────────────────────── */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.status-bar-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.status-pill {
+  position: relative;
+  cursor: pointer;
+}
+
+.status-pill input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.status-pill span {
+  display: inline-block;
+  padding: 4px 13px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 2px solid transparent;
+  background: var(--bg);
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.status-pill:hover span { filter: brightness(0.95); }
+
+.status-pill.s-nuevo:has(input:checked)        span { background: #e2e8f0; color: #334155; border-color: #94a3b8; }
+.status-pill.s-reuniendo:has(input:checked)    span { background: var(--warn-bg); color: var(--warn); border-color: #fb923c; }
+.status-pill.s-lista:has(input:checked)        span { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
+.status-pill.s-presentada:has(input:checked)   span { background: #ede9fe; color: #5b21b6; border-color: #7c3aed; }
+.status-pill.s-inicio:has(input:checked)       span { background: #ccfbf1; color: #0f766e; border-color: #14b8a6; }
+.status-pill.s-favorable:has(input:checked)    span { background: var(--ok-bg); color: var(--ok); border-color: #16a34a; }
+.status-pill.s-desfavorable:has(input:checked) span { background: var(--stop-bg); color: var(--stop); border-color: #dc2626; }
+.status-pill.s-cerrada:has(input:checked)      span { background: #f1f5f9; color: #475569; border-color: #64748b; }
+
+.status-card,
+.notice,
+.summary-card,
+.summary-pill,
+.check-item {
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.status-card.ok,
+.notice.success {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.status-card.warn,
+.notice.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.status-card.stop,
+.notice.error {
+  background: var(--stop-bg);
+  color: var(--stop);
+}
+
+.notice.info,
+.summary-card,
+.summary-pill,
+.check-item {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.status-card h3,
+.subpanel h3 {
+  margin-top: 0;
+}
+
+.summary-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.summary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 7px 12px;
+  border-radius: 999px;
+}
+
+.summary-pill span {
+  font-size: 0.82rem;
+}
+
+.summary-pill strong {
+  display: inline;
+  font-size: 0.95rem;
+}
+
+.checklist {
+  display: grid;
+  gap: 10px;
+}
+
+.check-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.check-item input[type="checkbox"] {
+  margin-top: 0.2rem;
+}
+
+.result-block + .result-block {
+  margin-top: 14px;
+}
+
+.result-block h4 {
+  margin-bottom: 8px;
+}
+
+.result-block ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  padding: 12px 10px;
+  vertical-align: top;
+}
+
+th {
+  font-size: 0.92rem;
+}
+
+td .table-action {
+  padding: 10px 14px;
+  font-size: 0.92rem;
+}
+
+.empty-state {
+  margin: 16px 0 0;
+  color: var(--muted);
+}
+
+/* ── Step wizard ─────────────────────────────────────────── */
+
+.step-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.step-dot.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.step-dot.done {
+  background: var(--ok);
+  color: #fff;
+}
+
+.step-progress-label {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.95rem;
+  margin-left: 4px;
+}
+
+.analysis-step {
+  display: none;
+}
+
+.analysis-step.active {
+  display: block;
+}
+
+.step-question {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 12px;
+}
+
+.step-question-secondary {
+  margin-top: 20px;
+}
+
+.step-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+/* ── Confirmation fields ─────────────────────────────────── */
+
+.confirm-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.field-error {
+  color: var(--stop);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ── Guidance redesign ───────────────────────────────────── */
+
+.route-badge {
+  display: inline-block;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 10px 0 6px;
+}
+
+.pending-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+}
+
+.pending-summary strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.check-item {
+  font-size: 1rem;
+  padding: 12px 14px;
+  line-height: 1.45;
+}
+
+.check-item .step-num {
+  font-weight: 700;
+  color: var(--primary);
+  flex-shrink: 0;
+  min-width: 1.4rem;
+}
+
+.checklist {
+  gap: 10px;
+}
+
+@media (max-width: 960px) {
+  .pending-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+  .field-grid.two-columns,
+  .guidance-grid,
+  .filters,
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .layout {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .panel {
+    box-shadow: none;
+    border-color: #bbb;
+  }
+
+  .toolbar,
+  .actions,
+  .filters,
+  #connect-csv-button,
+  button {
+    display: none !important;
+  }
+}
+
+/* Step help details */
+details.step-help {
+  margin: 6px 0 10px 20px;
+  background: #f0f4ff;
+  border-left: 3px solid #4a6cf7;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 0.85em;
+}
+details.step-help summary {
+  cursor: pointer;
+  color: #4a6cf7;
+  font-weight: 600;
+  user-select: none;
+}
+details.step-help p {
+  margin: 6px 0 2px 0;
+  color: #333;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+/* Field hint text */
+.field-hint {
+  display: block;
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* Autosave indicator */
+.autosave-indicator {
+  display: inline-block;
+  opacity: 0;
+  font-size: 0.82em;
+  color: #28a745;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: #e6f9ed;
+  transition: opacity 0.4s;
+  align-self: center;
+}
+.autosave-indicator.visible {
+  opacity: 1;
+}
+
+/* Route badge pills in case table */
+.route-badge-pill {
+  display: inline-block;
+  font-size: 0.75em;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.route-irregular { background: #fff3cd; color: #856404; }
+.route-pi        { background: #cfe2ff; color: #084298; }
+.route-family    { background: #d1e7dd; color: #0a3622; }
+.route-pending   { background: #f8d7da; color: #842029; }
+.route-other     { background: #e2e3e5; color: #41464b; }
+
+/* Overdue rows and date */
+tr.row-overdue {
+  background: #fff5f5;
+}
+tr.row-overdue:hover {
+  background: #ffe9e9;
+}
+.overdue-date {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+/* Overdue summary card */
+.summary-pill.overdue strong {
+  color: #c0392b;
+}
+.summary-pill.overdue {
+  border-color: #f5c2c7;
+  background: #fff5f5;
+}
+
+/* Urgent filter button */
+.urgent-filter-btn {
+  align-self: flex-end;
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+.urgent-filter-btn.active {
+  background: #e74c3c;
+  color: #fff;
+  border-color: #e74c3c;
+}
+
+/* Filters row layout */
+.filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}

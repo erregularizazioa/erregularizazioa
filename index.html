@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html id="html-root" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="page.title">Regularizazioa 2026</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="layout">
+    <header class="hero">
+      <div class="hero-top">
+        <p class="eyebrow" data-i18n="hero.eyebrow">Regularizacion extraordinaria 2026</p>
+        <div class="lang-toggle">
+          <button id="lang-es" class="lang-btn active">ES</button>
+          <button id="lang-fr" class="lang-btn">FR</button>
+        </div>
+      </div>
+      <h1 data-i18n="hero.h1">Ficha unica de caso</h1>
+      <p id="hero-intro" class="intro" data-i18n="hero.intro">
+        Aqui se rellena todo en un solo sitio: datos del caso, analisis, documentacion, pasos y seguimiento.
+        Los datos se guardan en una base de datos local en tu ordenador. Puedes exportar a Excel cuando quieras.
+      </p>
+      <div id="runtime-mode-message" class="notice info hidden" role="status" data-i18n="static.banner">
+        Esta version publica solo muestra el simulador y la orientacion. No guarda casos ni exporta datos.
+      </div>
+    </header>
+
+    <section class="panel">
+      <div id="storage-message" class="notice hidden" role="status"></div>
+
+      <form id="case-form" class="form-grid">
+        <input id="case-id" type="hidden">
+
+        <div class="section-heading">
+          <div>
+            <h2 data-i18n="form.heading">Ficha del caso</h2>
+            <p class="note" data-i18n="form.note">Rellena la ficha y marca la documentacion y los pasos a medida que el caso avanza.</p>
+          </div>
+          <div class="toolbar">
+            <span id="case-id-preview" class="id-badge hidden"></span>
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="status-bar-label" data-i18n="field.status">Estado del caso</span>
+          <div class="status-pills">
+            <label class="status-pill s-nuevo"><input type="radio" name="caseStatus" value="Nuevo" checked><span data-i18n="status.new">Nuevo</span></label>
+            <label class="status-pill s-reuniendo"><input type="radio" name="caseStatus" value="Reuniendo documentos"><span data-i18n="status.gathering">Reuniendo documentos</span></label>
+            <label class="status-pill s-lista"><input type="radio" name="caseStatus" value="Lista para presentar"><span data-i18n="status.ready">Lista para presentar</span></label>
+            <label class="status-pill s-presentada"><input type="radio" name="caseStatus" value="Presentada"><span data-i18n="status.submitted">Presentada</span></label>
+            <label class="status-pill s-inicio"><input type="radio" name="caseStatus" value="Inicio recibido"><span data-i18n="status.started">Inicio recibido</span></label>
+            <label class="status-pill s-favorable"><input type="radio" name="caseStatus" value="Favorable"><span data-i18n="status.favorable">Favorable</span></label>
+            <label class="status-pill s-desfavorable"><input type="radio" name="caseStatus" value="Desfavorable"><span data-i18n="status.unfavorable">Desfavorable</span></label>
+            <label class="status-pill s-cerrada"><input type="radio" name="caseStatus" value="Cerrada"><span data-i18n="status.closed">Cerrada</span></label>
+          </div>
+        </div>
+
+        <div class="field-grid two-columns">
+          <label class="field">
+            <span data-i18n="field.name">Nombre o alias</span>
+            <input id="case-name" type="text" data-i18n-placeholder="field.name.placeholder" placeholder="Ej. Amina / Caso Bilbao 03" required>
+          </label>
+
+          <div class="field">
+            <span data-i18n="field.phone">Telefono</span>
+            <input id="case-phone" type="tel" data-i18n-placeholder="field.phone.placeholder" placeholder="600123123" autocomplete="off">
+            <span class="field-error hidden" id="phone-error" data-i18n="error.phone">&#9888; Formato no valido (ej. 600123123)</span>
+          </div>
+
+          <div class="field">
+            <span data-i18n="field.email">Email</span>
+            <input id="case-email" type="email" data-i18n-placeholder="field.email.placeholder" placeholder="correo@ejemplo.org" autocomplete="off">
+            <span class="field-error hidden" id="email-error" data-i18n="error.email">&#9888; Formato de email no valido</span>
+          </div>
+
+          <label class="field">
+            <span data-i18n="field.locality">Municipio</span>
+            <input id="case-locality" type="text" value="Bergara" placeholder="Bergara">
+          </label>
+
+          <label class="field">
+            <span data-i18n="field.volunteer">Persona voluntaria</span>
+            <input id="case-volunteer" type="text" data-i18n-placeholder="field.volunteer.placeholder" placeholder="Nombre de quien hace seguimiento">
+          </label>
+
+          <label class="field">
+            <span data-i18n="field.nextDate">Fecha del siguiente paso</span>
+            <input id="case-next-date" type="date">
+            <span class="field-hint" data-i18n="field.nextDate.hint">Fecha de la proxima cita, reunion o gestion pendiente (p. ej. cita en Mercurio, llamada de seguimiento).</span>
+          </label>
+        </div>
+
+        <div id="duplicate-warning" class="notice warn hidden" role="status"></div>
+
+        <fieldset id="analysis-fieldset">
+          <legend data-i18n="analysis.legend">Analisis del caso</legend>
+
+          <div class="step-progress" id="step-progress">
+            <span class="step-dot active" data-step-dot="1">1</span>
+            <span class="step-dot" data-step-dot="2">2</span>
+            <span class="step-dot" data-step-dot="3">3</span>
+            <span class="step-dot" data-step-dot="4">4</span>
+            <span class="step-dot" data-step-dot="5">5</span>
+            <span class="step-dot" data-step-dot="6">6</span>
+            <span class="step-progress-label" id="step-progress-label">La persona</span>
+          </div>
+
+          <div class="analysis-step active" data-step="1">
+            <p class="step-question" data-i18n="step.1.q1">&#8594; Quien va a hacer la solicitud?</p>
+            <label class="choice"><input type="radio" name="personType" value="adult" checked> <span data-i18n="step.1.r.adult">Persona adulta</span></label>
+            <label class="choice"><input type="radio" name="personType" value="minor"> <span data-i18n="step.1.r.minor">Menor de edad o hijo/a que iria con su familia</span></label>
+          </div>
+
+          <div class="analysis-step" data-step="2">
+            <div data-minor-only class="hidden">
+              <p class="step-question" data-i18n="step.minor.birth">&#8594; El menor ha nacido en Espana o en el extranjero?</p>
+              <details class="step-help">
+                <summary data-i18n="help.expand">Que significa esto?</summary>
+                <p data-i18n="help.stepMinor.birth">La documentacion oficial separa a menores nacidos en Espana de los nacidos en el extranjero porque cambia el certificado de nacimiento exigido y, en los casos del extranjero, tambien puede hacer falta traduccion o legalizacion.</p>
+              </details>
+              <label class="choice"><input type="radio" name="minorBirthPlace" value="spain" checked> <span data-i18n="step.minor.birth.spain">Ha nacido en Espana</span></label>
+              <label class="choice"><input type="radio" name="minorBirthPlace" value="abroad"> <span data-i18n="step.minor.birth.abroad">Ha nacido en el extranjero</span></label>
+
+              <p class="step-question step-question-secondary" data-i18n="step.minor.guardian">&#8594; La persona progenitora o tutora esta en situacion regular o irregular?</p>
+              <details class="step-help">
+                <summary data-i18n="help.expand">Que significa esto?</summary>
+                <p data-i18n="help.stepMinor.guardian">Tambien cambia la ruta cuando quien representa al menor ya tiene autorizacion de residencia o, por el contrario, esta en situacion irregular y debe tramitar por la via extraordinaria correspondiente.</p>
+              </details>
+              <label class="choice"><input type="radio" name="minorGuardianStatus" value="regular" checked> <span data-i18n="step.minor.guardian.regular">Progenitor o tutor en situacion regular</span></label>
+              <label class="choice"><input type="radio" name="minorGuardianStatus" value="irregular"> <span data-i18n="step.minor.guardian.irregular">Progenitor o tutor en situacion irregular</span></label>
+
+              <p class="step-question step-question-secondary" data-i18n="step.minor.schooling">&#8594; Esta en edad de escolarizacion obligatoria o ya se puede acreditar la matricula?</p>
+              <label class="choice"><input type="radio" name="minorSchoolingRequired" value="yes" checked> <span data-i18n="step.minor.schooling.yes">Si, hay que reunir prueba de escolarizacion</span></label>
+              <label class="choice"><input type="radio" name="minorSchoolingRequired" value="no"> <span data-i18n="step.minor.schooling.no">No aplica en este caso</span></label>
+
+              <p class="step-question step-question-secondary" data-i18n="step.minor.custody">&#8594; Hace falta acreditar custodia, tutela exclusiva o autorizacion del otro progenitor?</p>
+              <label class="choice"><input type="radio" name="minorNeedsCustodyProof" value="no" checked> <span data-i18n="step.minor.custody.no">No</span></label>
+              <label class="choice"><input type="radio" name="minorNeedsCustodyProof" value="yes"> <span data-i18n="step.minor.custody.yes">Si</span></label>
+
+              <p class="step-question step-question-secondary" data-i18n="step.minor.disability">&#8594; Hay discapacidad acreditable que deba incorporarse a la documentacion?</p>
+              <label class="choice"><input type="radio" name="minorHasDisability" value="no" checked> <span data-i18n="step.minor.disability.no">No</span></label>
+              <label class="choice"><input type="radio" name="minorHasDisability" value="yes"> <span data-i18n="step.minor.disability.yes">Si</span></label>
+            </div>
+
+            <div data-adult-only>
+              <p class="step-question" data-i18n="step.5.q1">&#8594; Puede acreditar que estaba en Espana antes del 1 de enero de 2026?</p>
+              <details class="step-help">
+                <summary data-i18n="help.expand">Que significa esto?</summary>
+                <p data-i18n="help.step5.q1">Documentos validos: empadronamiento municipal (el mas comun), contratos de trabajo o nominas, recibos medicos o del centro de salud, matriculas escolares de hijos, extractos bancarios con fecha, cartas de entidades sociales o parroquias. Vale cualquier documento oficial con nombre y fecha anterior al 1 de enero de 2026.</p>
+              </details>
+              <label class="choice"><input type="radio" name="beforeJan2026" value="no" checked> <span data-i18n="step.5.r.before.no">No puede acreditarlo</span></label>
+              <label class="choice"><input type="radio" name="beforeJan2026" value="yes"> <span data-i18n="step.5.r.before.yes">Si puede acreditarlo</span></label>
+              <p class="step-question step-question-secondary" data-i18n="step.5.q2">&#8594; Puede acreditar 5 meses continuados antes de la solicitud?</p>
+              <details class="step-help">
+                <summary data-i18n="help.expand">Que significa esto?</summary>
+                <p data-i18n="help.step5.q2">Ademas de la presencia antes de enero 2026, hay que demostrar 5 meses de permanencia continua antes de presentar la solicitud. Sirven los mismos documentos: empadronamiento, contrato de alquiler, facturas de servicios (luz, agua, gas), recibos medicos, nominas. Cuantos mas documentos con fechas distintas y seguidas, mejor. Un unico documento puede no ser suficiente.</p>
+              </details>
+              <label class="choice"><input type="radio" name="fiveMonths" value="no" checked> <span data-i18n="step.5.r.months.no">No puede acreditarlo</span></label>
+              <label class="choice"><input type="radio" name="fiveMonths" value="yes"> <span data-i18n="step.5.r.months.yes">Si puede acreditarlo</span></label>
+            </div>
+          </div>
+
+          <div class="analysis-step" data-step="3">
+            <p class="step-question" data-i18n="step.2.q1">&#8594; Tiene autorizacion de residencia en vigor?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step2.q1">Tiene autorizacion en vigor si dispone de TIE vigente, autorizacion de trabajo o residencia activa, o renovacion/prorroga ya presentada y en tramite. Si solo tiene NIE caducado sin renovacion en curso, NO cuenta como en vigor.</p>
+            </details>
+            <label class="choice"><input type="radio" name="validPermit" value="no" checked> <span data-i18n="step.2.r.no">No tiene autorizacion en vigor ni renovacion/prorroga</span></label>
+            <label class="choice"><input type="radio" name="validPermit" value="yes"> <span data-i18n="step.2.r.yes">Si tiene autorizacion en vigor o renovacion/prorroga</span></label>
+          </div>
+
+          <div class="analysis-step" data-step="4">
+            <p class="step-question" data-i18n="step.3.q1">&#8594; Tiene proteccion temporal por Ucrania?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step3.q1">La proteccion temporal por Ucrania fue concedida por la UE tras la invasion de 2022. Si tienen una autorizacion de residencia por proteccion temporal, NO encajan en esta via. Hay que derivarles al procedimiento de proteccion temporal.</p>
+            </details>
+            <label class="choice"><input type="radio" name="ukraineProtection" value="no" checked> <span data-i18n="step.3.r.ukraine.no">No</span></label>
+            <label class="choice"><input type="radio" name="ukraineProtection" value="yes"> <span data-i18n="step.3.r.ukraine.yes">Si (queda excluida de esta via)</span></label>
+            <p class="step-question step-question-secondary" data-i18n="step.3.q2">&#8594; Esta en procedimiento de apatridia o tiene estatuto de apatrida?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step3.q2">Una persona apatrida no tiene la nacionalidad de ningun pais. Si esta en proceso de reconocimiento de apatridia o ya tiene el estatuto, existe un procedimiento propio. Es un caso muy poco frecuente: preguntar directamente si tienen expediente de apatridia.</p>
+            </details>
+            <label class="choice"><input type="radio" name="stateless" value="no" checked> <span data-i18n="step.3.r.stateless.no">No</span></label>
+            <label class="choice"><input type="radio" name="stateless" value="yes"> <span data-i18n="step.3.r.stateless.yes">Si (queda excluida de esta via)</span></label>
+            <p class="step-question step-question-secondary" data-i18n="step.3.q3">&#8594; Hay incidencias de orden publico o seguridad publica que obliguen a revisar el caso?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step3.q3">La documentacion oficial excluye o exige revisar con mucho cuidado los casos en los que la persona pueda representar una amenaza para el orden publico o la seguridad publica. Si hay dudas serias, no conviene tratar el caso como un encaje ordinario sin revision especializada.</p>
+            </details>
+            <label class="choice"><input type="radio" name="publicOrderRisk" value="no" checked> <span data-i18n="step.3.r.publicOrder.no">No</span></label>
+            <label class="choice"><input type="radio" name="publicOrderRisk" value="yes"> <span data-i18n="step.3.r.publicOrder.yes">Si, hace falta revision especializada</span></label>
+            <p class="step-question step-question-secondary" data-i18n="step.3.q4">&#8594; Hay incidencias de salud publica que puedan afectar la via?</p>
+            <label class="choice"><input type="radio" name="publicHealthRisk" value="no" checked> <span data-i18n="step.3.r.publicHealth.no">No</span></label>
+            <label class="choice"><input type="radio" name="publicHealthRisk" value="yes"> <span data-i18n="step.3.r.publicHealth.yes">Si, hace falta revision especializada</span></label>
+            <p class="step-question step-question-secondary" data-i18n="step.3.q5">&#8594; Figura como rechazable en territorio con convenio?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step3.q5">Algunas alertas de rechazo o prohibicion de entrada en territorios con convenio pueden impedir o complicar esta via. Si aparece esta situacion, hay que revisar el caso antes de preparar la presentacion.</p>
+            </details>
+            <label class="choice"><input type="radio" name="rejectableRecord" value="no" checked> <span data-i18n="step.3.r.rejectable.no">No</span></label>
+            <label class="choice"><input type="radio" name="rejectableRecord" value="yes"> <span data-i18n="step.3.r.rejectable.yes">Si</span></label>
+            <p class="step-question step-question-secondary" data-i18n="step.3.q6">&#8594; Esta dentro del plazo de compromiso de no retorno?</p>
+            <label class="choice"><input type="radio" name="nonReturnCommitment" value="no" checked> <span data-i18n="step.3.r.nonReturn.no">No</span></label>
+            <label class="choice"><input type="radio" name="nonReturnCommitment" value="yes"> <span data-i18n="step.3.r.nonReturn.yes">Si</span></label>
+          </div>
+
+          <div class="analysis-step" data-step="5">
+            <p class="step-question" data-i18n="step.4.q1">&#8594; Tiene alguna solicitud de arraigo u otras circunstancias excepcionales pendiente?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step4.q1">El arraigo es una autorizacion de residencia para personas en situacion irregular que llevan tiempo en Espana. Si ya presentaron una solicitud de arraigo o circunstancias excepcionales pendiente de resolucion, lo habitual es NO presentar encima esta nueva solicitud. Primero hay que consultar el estado exacto.</p>
+            </details>
+            <label class="choice"><input type="radio" name="pendingApplication" value="no" checked> <span data-i18n="step.4.r.no">No hay solicitud pendiente</span></label>
+            <label class="choice"><input type="radio" name="pendingApplication" value="yes"> <span data-i18n="step.4.r.yes">Si, hay una solicitud pendiente</span></label>
+          </div>
+
+          <div class="analysis-step" data-step="6">
+            <p class="step-question" data-i18n="step.6.q1">&#8594; Solicito Proteccion Internacional antes del 1 de enero de 2026?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step6.q1">La Proteccion Internacional (PI) incluye el asilo politico y la proteccion subsidiaria. Si presento una solicitud de PI antes del 1 de enero de 2026 (aunque este en tramite, denegada o recurrida), puede acceder a esta via especial. La tarjeta roja (solicitante de asilo) o blanca (resolucion favorable) sirven de prueba. Si no tiene tarjeta pero presento solicitud, buscar el resguardo de presentacion.</p>
+            </details>
+            <label class="choice"><input type="radio" name="piBefore2026" value="yes"> <span data-i18n="step.6.r.pi.yes">Si, es solicitante de PI anterior al 1 de enero de 2026</span></label>
+            <label class="choice"><input type="radio" name="piBefore2026" value="no" checked> <span data-i18n="step.6.r.pi.no">No</span></label>
+            <div id="irregular-criteria">
+              <p class="step-question step-question-secondary" data-i18n="step.6.q2">&#8594; En situacion irregular, marca al menos una opcion:</p>
+              <details class="step-help">
+                <summary data-i18n="help.expand">Que significa esto?</summary>
+                <p data-i18n="help.step6.q2">Para la via por irregularidad hay que cumplir al menos UNO de estos tres supuestos:
+1. Trabajo: ha trabajado o puede acreditar intencion de trabajar. No hace falta que fuera trabajo legal; sirven testimonios de empleadores, nominas, contratos informales.
+2. Familia: tiene hijos/as menores, familiar con discapacidad reconocida, o padres o hijos adultos convivientes en el mismo domicilio.
+3. Vulnerabilidad: los servicios sociales municipales o entidad colaboradora del Ministerio pueden emitir un certificado. Hay que gestionarlo con antelacion porque puede tardar.</p>
+              </details>
+              <label class="choice"><input type="checkbox" name="irregularCriterion" value="work"> <span data-i18n="step.6.c.work">Ha trabajado o puede acreditar intencion de trabajar</span></label>
+              <label class="choice"><input type="checkbox" name="irregularCriterion" value="family"> <span data-i18n="step.6.c.family">Tiene unidad familiar con menores, discapacidad o ascendientes de primer grado convivientes</span></label>
+              <label class="choice"><input type="checkbox" name="irregularCriterion" value="vulnerability"> <span data-i18n="step.6.c.vulnerability">Puede conseguir certificado de vulnerabilidad</span></label>
+            </div>
+            <p class="step-question step-question-secondary" data-i18n="step.5.q4">&#8594; Sin antecedentes penales ni problemas de orden publico o salud publica?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step5.q4">Hay que pedir el certificado de antecedentes penales del pais de origen a traves del consulado o embajada. El proceso puede tardar semanas o meses: conviene pedirlo cuanto antes. Si tiene NIE, tambien puede pedir el certificado espanol online en el Ministerio de Justicia. Si hay antecedentes graves, existe una via diplomatica excepcional pero muy limitada: consultar con entidad especializada.</p>
+            </details>
+            <label class="choice"><input type="radio" name="criminalRecord" value="unsure" checked> <span data-i18n="step.5.r.criminal.unsure">Todavia no esta claro o falta el certificado</span></label>
+            <label class="choice"><input type="radio" name="criminalRecord" value="yes"> <span data-i18n="step.5.r.criminal.yes">Si, sin antecedentes</span></label>
+            <label class="choice"><input type="radio" name="criminalRecord" value="no"> <span data-i18n="step.5.r.criminal.no">No cumple este requisito</span></label>
+            <p class="step-question step-question-secondary" data-i18n="step.5.q3">&#8594; Tiene pasaporte, cedula de inscripcion o titulo de viaje?</p>
+            <details class="step-help">
+              <summary data-i18n="help.expand">Que significa esto?</summary>
+              <p data-i18n="help.step5.q3">El simulador oficial del Ministerio pregunta expresamente por pasaporte, cedula de inscripcion o titulo de viaje. Si todavia no hay ninguno de esos documentos, no conviene dar la solicitud por preparada aunque el resto de requisitos parezcan encajar.</p>
+            </details>
+            <label class="choice"><input type="radio" name="identityDocument" value="no" checked> <span data-i18n="step.5.r.identity.no">No</span></label>
+            <label class="choice"><input type="radio" name="identityDocument" value="yes"> <span data-i18n="step.5.r.identity.yes">Si</span></label>
+          </div>
+
+          <div class="step-nav">
+            <button type="button" id="step-prev" class="secondary hidden" data-i18n="step.prev">&#8592; Anterior</button>
+            <button type="button" id="step-next" data-i18n="step.next">Siguiente &#8594;</button>
+          </div>
+        </fieldset>
+
+        <div class="guidance-grid">
+          <div class="subpanel guidance-diagnosis">
+            <h3 data-i18n="guidance.diagnosis.heading">Diagnostico del caso</h3>
+            <div id="guidance-preview"></div>
+          </div>
+
+          <div class="subpanel">
+            <h3 data-i18n="guidance.docs.heading">Documentacion a revisar</h3>
+            <div id="guidance-documents"></div>
+          </div>
+
+          <div class="subpanel">
+            <h3 data-i18n="guidance.steps.heading">Pasos del proceso</h3>
+            <div id="guidance-steps"></div>
+          </div>
+        </div>
+
+        <label class="field">
+          <span data-i18n="field.nextAction">Proximo paso recomendado</span>
+          <textarea id="case-next-action" rows="3" data-i18n-placeholder="field.nextAction.placeholder" placeholder="La ficha lo ira sugiriendo automaticamente, pero puedes ajustarlo"></textarea>
+        </label>
+
+        <label class="field">
+          <span data-i18n="field.notes">Notas del caso</span>
+          <textarea id="case-notes" rows="4" data-i18n-placeholder="field.notes.placeholder" placeholder="Observaciones, bloqueos o detalles de seguimiento"></textarea>
+        </label>
+
+        <div class="actions">
+          <button id="save-case-button" type="submit" data-i18n="btn.save">Guardar caso</button>
+          <button type="button" id="clear-case-button" class="secondary" data-i18n="btn.clear">Limpiar ficha</button>
+          <button type="button" id="print-button" class="secondary" data-i18n="btn.print">Imprimir ficha</button>
+          <button type="button" id="copy-summary-button" class="secondary" data-i18n="btn.copySummary">Copiar resumen</button>
+          <span id="autosave-indicator" class="autosave-indicator"></span>
+        </div>
+      </form>
+    </section>
+
+    <section id="cases-panel" class="panel">
+      <div class="section-heading">
+        <div>
+          <h2 data-i18n="cases.heading">Casos guardados</h2>
+          <p class="note" data-i18n="cases.note">Busca por ID, nombre, telefono, voluntariado o localidad.</p>
+        </div>
+        <div class="toolbar">
+          <button type="button" id="backup-button" class="secondary" data-i18n="btn.backup">Copia</button>
+          <button type="button" id="restore-button" class="secondary" data-i18n="btn.restore">Restaurar</button>
+          <button type="button" id="export-excel-button" class="secondary" data-i18n="btn.excel">Exportar a Excel</button>
+        </div>
+      </div>
+      <div id="case-summary" class="summary-grid"></div>
+
+      <div class="filters">
+        <label class="field">
+          <span data-i18n="search.label">Buscar</span>
+          <input id="case-search" type="search" data-i18n-placeholder="search.placeholder" placeholder="REG-2026-00001 / nombre / telefono">
+        </label>
+
+        <label class="field">
+          <span data-i18n="filter.label">Filtrar por estado</span>
+          <select id="case-status-filter">
+            <option value="" data-i18n="status.filter.all">Todos</option>
+            <option value="Nuevo" data-i18n="status.new">Nuevo</option>
+            <option value="Reuniendo documentos" data-i18n="status.gathering">Reuniendo documentos</option>
+            <option value="Lista para presentar" data-i18n="status.ready">Lista para presentar</option>
+            <option value="Presentada" data-i18n="status.submitted">Presentada</option>
+            <option value="Inicio recibido" data-i18n="status.started">Inicio recibido</option>
+            <option value="Favorable" data-i18n="status.favorable">Favorable</option>
+            <option value="Desfavorable" data-i18n="status.unfavorable">Desfavorable</option>
+            <option value="Cerrada" data-i18n="status.closed">Cerrada</option>
+          </select>
+        </label>
+
+        <button type="button" id="urgent-filter-button" class="secondary urgent-filter-btn" data-i18n="filter.urgent">Solo urgentes</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="table.id">ID</th>
+              <th data-i18n="table.person">Persona</th>
+              <th data-i18n="table.route">Ruta</th>
+              <th data-i18n="table.status">Estado</th>
+              <th data-i18n="table.nextDate">Proxima cita</th>
+              <th data-i18n="table.nextStep">Proximo paso</th>
+              <th data-i18n="table.volunteer">Voluntariado</th>
+              <th data-i18n="table.updated">Actualizado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="case-table-body"></tbody>
+        </table>
+      </div>
+
+      <p id="case-empty" class="empty-state" data-i18n="table.empty">Todavia no hay casos guardados.</p>
+    </section>
+
+    <section class="panel">
+      <h2 data-i18n="links.heading">Enlaces oficiales utiles</h2>
+      <ul class="simple-list">
+        <li><a href="https://www.inclusion.gob.es/regularizacion">Portal de regularizacion</a></li>
+        <li><a href="https://mercurio.delegaciondelgobierno.gob.es/mercurio/">Plataforma Mercurio</a></li>
+        <li data-i18n="links.phone">Telefono 060 para dudas y cita previa.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="translations.js"></script>
+  <script src="logic.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
