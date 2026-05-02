@@ -1,10 +1,13 @@
 const logic = window.RegularizacionLogic;
 const T = window.TRANSLATIONS;
 const runtimeConfig = window.REGULARIZAZIOA_APP_CONFIG || {};
-const appMode = runtimeConfig.mode === "desktop" || runtimeConfig.mode === "static"
+const appMode = runtimeConfig.mode === "desktop" || runtimeConfig.mode === "static" || runtimeConfig.mode === "web-private"
   ? runtimeConfig.mode
   : (window.electronAPI ? "desktop" : "static");
 const isStaticMode = appMode === "static";
+const isWebPrivateMode = appMode === "web-private";
+const supportsCaseStorage = !isStaticMode;
+const supportsDesktopOnlyTools = appMode === "desktop";
 const api = !isStaticMode && window.electronAPI
   ? window.electronAPI
   : {
@@ -25,6 +28,10 @@ const casePhoneField        = document.getElementById("case-phone");
 const caseEmailField        = document.getElementById("case-email");
 const caseLocalityField     = document.getElementById("case-locality");
 const caseVolunteerField    = document.getElementById("case-volunteer");
+const caseRepresentativeNameField  = document.getElementById("case-representative-name");
+const caseRepresentativePhoneField = document.getElementById("case-representative-phone");
+const caseRepresentativeEmailField = document.getElementById("case-representative-email");
+const caseNotificationTargetField  = document.getElementById("case-notification-target");
 const caseNextDateField     = document.getElementById("case-next-date");
 const caseNextActionField   = document.getElementById("case-next-action");
 const caseNotesField        = document.getElementById("case-notes");
@@ -84,12 +91,12 @@ function tResult(code) {
 
 function applyRuntimeText() {
   if (heroIntro) {
-    heroIntro.textContent = isStaticMode ? t("hero.intro.static") : t("hero.intro");
+    heroIntro.textContent = isStaticMode ? t("hero.intro.static") : (isWebPrivateMode ? t("hero.intro.private") : t("hero.intro"));
   }
 
   if (runtimeModeMessage) {
-    runtimeModeMessage.textContent = t("static.banner");
-    runtimeModeMessage.classList.toggle("hidden", !isStaticMode);
+    runtimeModeMessage.textContent = isStaticMode ? t("static.banner") : t("private.banner");
+    runtimeModeMessage.classList.toggle("hidden", !(isStaticMode || isWebPrivateMode));
   }
 }
 
@@ -130,15 +137,21 @@ function applyRuntimeMode() {
   document.body.dataset.appMode = appMode;
   document.documentElement.dataset.appMode = appMode;
 
-  if (!isStaticMode) return;
-
-  if (saveCaseButton) saveCaseButton.classList.add("hidden");
-  if (autosaveIndicator) autosaveIndicator.classList.add("hidden");
-  if (caseIdPreview) {
-    caseIdPreview.textContent = "";
-    caseIdPreview.classList.add("hidden");
+  if (isStaticMode) {
+    if (saveCaseButton) saveCaseButton.classList.add("hidden");
+    if (autosaveIndicator) autosaveIndicator.classList.add("hidden");
+    if (caseIdPreview) {
+      caseIdPreview.textContent = "";
+      caseIdPreview.classList.add("hidden");
+    }
+    if (casesPanel) casesPanel.classList.add("hidden");
   }
-  if (casesPanel) casesPanel.classList.add("hidden");
+
+  if (!supportsDesktopOnlyTools) {
+    if (backupButton) backupButton.classList.add("hidden");
+    if (restoreButton) restoreButton.classList.add("hidden");
+    if (exportExcelButton) exportExcelButton.classList.add("hidden");
+  }
 }
 
 function escapeHtml(value) {
@@ -356,6 +369,10 @@ function collectCaseFormData() {
     email:      caseEmailField.value.trim(),
     locality:   caseLocalityField.value.trim(),
     volunteer:  caseVolunteerField.value.trim(),
+    representativeName: caseRepresentativeNameField.value.trim(),
+    representativePhone: caseRepresentativePhoneField.value.trim(),
+    representativeEmail: caseRepresentativeEmailField.value.trim(),
+    notificationTarget: caseNotificationTargetField.value,
     caseStatus: getRadioValue("caseStatus") || "Nuevo",
     nextDate:   caseNextDateField.value.trim(),
     nextAction: caseNextActionField.value.trim(),
@@ -468,6 +485,8 @@ function buildCaseSummaryText() {
     t("field.name") + ": " + (formData.caseName || "-"),
     t("table.route") + ": " + (tr.routeLabel || result.routeLabel || "-"),
     t("field.status") + ": " + (formData.caseStatus || "-"),
+    t("field.notificationTarget") + ": " + t("notificationTarget." + (formData.notificationTarget || "persona")),
+    t("field.representativeName") + ": " + (formData.representativeName || "-"),
     t("field.nextDate") + ": " + (formData.nextDate ? formatDate(formData.nextDate) : "-"),
     t("field.nextAction") + ": " + (caseNextActionField.value.trim() || guidance.recommendedAction || "-"),
     t("guidance.pending.docs") + ": " + guidance.documentsPendingSummary,
@@ -497,7 +516,11 @@ function getFilteredCases() {
   var filtered = casesState.filter(function(c) {
     var matchesStatus = !statusFilter || c.caseStatus === statusFilter;
     var matchesUrgent = !urgentFilterActive || isOverdue(c);
-    var haystack = [c.id, c.caseName, c.phone, c.email, c.locality, c.volunteer, c.route, c.nextAction]
+    var haystack = [
+      c.id, c.caseName, c.phone, c.email, c.locality, c.volunteer,
+      c.representativeName, c.representativePhone, c.representativeEmail,
+      c.notificationTarget, c.route, c.nextAction
+    ]
       .join(" ").toLowerCase();
     return matchesStatus && matchesUrgent && (!search || haystack.includes(search));
   });
@@ -570,6 +593,10 @@ function clearCaseForm() {
   caseIdPreview.textContent = "";
   caseIdPreview.classList.add("hidden");
   caseLocalityField.value   = "Bergara";
+  caseRepresentativeNameField.value = "";
+  caseRepresentativePhoneField.value = "";
+  caseRepresentativeEmailField.value = "";
+  caseNotificationTargetField.value = "persona";
   setRadioValue("caseStatus", "Nuevo");
   document.getElementById("phone-error").classList.add("hidden");
   document.getElementById("email-error").classList.add("hidden");
@@ -592,6 +619,10 @@ function populateCaseForm(caseItem) {
   document.getElementById("email-error").classList.add("hidden");
   caseLocalityField.value     = c.locality || "Bergara";
   caseVolunteerField.value    = c.volunteer;
+  caseRepresentativeNameField.value  = c.representativeName || "";
+  caseRepresentativePhoneField.value = c.representativePhone || "";
+  caseRepresentativeEmailField.value = c.representativeEmail || "";
+  caseNotificationTargetField.value  = c.notificationTarget || "persona";
   setRadioValue("caseStatus", c.caseStatus || "Nuevo");
   caseNextDateField.value     = c.nextDate;
   caseNotesField.value        = c.notes;
@@ -673,8 +704,8 @@ clearCaseButton.addEventListener("click", clearCaseForm);
 printButton.addEventListener("click", function() { window.print(); });
 
 exportExcelButton.addEventListener("click", async function() {
-  if (isStaticMode) {
-    setStorageMessage(t("msg.static.readOnly"), "info");
+  if (!supportsDesktopOnlyTools) {
+    setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
     return;
   }
   if (!casesState.length) {
@@ -694,8 +725,8 @@ exportExcelButton.addEventListener("click", async function() {
 });
 
 backupButton.addEventListener("click", async function() {
-  if (isStaticMode) {
-    setStorageMessage(t("msg.static.readOnly"), "info");
+  if (!supportsDesktopOnlyTools) {
+    setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
     return;
   }
   try {
@@ -713,8 +744,8 @@ backupButton.addEventListener("click", async function() {
 });
 
 restoreButton.addEventListener("click", async function() {
-  if (isStaticMode) {
-    setStorageMessage(t("msg.static.readOnly"), "info");
+  if (!supportsDesktopOnlyTools) {
+    setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
     return;
   }
   try {
@@ -742,7 +773,7 @@ async function performSave(options) {
   var silent = options && options.silent;
   clearStorageMessage();
 
-  if (isStaticMode) {
+  if (!supportsCaseStorage) {
     if (!silent) setStorageMessage(t("msg.static.readOnly"), "info");
     return;
   }
@@ -813,7 +844,7 @@ caseForm.addEventListener("submit", function(event) {
 // Autosave on focusout (debounced 1.5s), only when caseName is filled
 var autosaveTimer = null;
 caseForm.addEventListener("focusout", function() {
-  if (isStaticMode) return;
+  if (!supportsCaseStorage) return;
   clearTimeout(autosaveTimer);
   if (!caseNameField.value.trim()) return;
   autosaveTimer = setTimeout(function() {
@@ -874,7 +905,7 @@ document.getElementById("lang-fr").addEventListener("click", function() { setLan
 async function initialize() {
   applyRuntimeMode();
 
-  if (!isStaticMode) {
+  if (supportsCaseStorage) {
     try {
       casesState = await api.getCases();
     } catch (err) {

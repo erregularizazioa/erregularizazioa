@@ -36,7 +36,10 @@ No requiere instalacion. En Windows basta con ejecutar el `.exe` directamente.
 npm run build:pages
 ```
 
-Esto genera `dist/pages/` con una version **solo de consulta**: mantiene el simulador, las traducciones, la logica de orientacion y las opciones de imprimir/copiar resumen, pero **no guarda casos**, **no restaura copias** y **no exporta a Excel**.
+Esto genera `dist/pages/` con dos entradas web:
+
+- `index.html` → pagina publica
+- `private.html` → area privada con login y casos centralizados en Supabase
 
 ### Publicacion automatica en GitHub Pages
 
@@ -55,6 +58,27 @@ La URL esperada sera:
 https://joanesplazaola.github.io/erregularizazioa/
 ```
 
+El acceso privado quedara en:
+
+```text
+https://joanesplazaola.github.io/erregularizazioa/private.html
+```
+
+### Configuracion de Supabase para el area privada
+
+1. En Supabase, ejecuta `supabase/schema.sql` en el SQL editor.
+2. En **Authentication → Providers → Email**, deja activo el acceso por email.
+3. En **Authentication → URL Configuration**, añade como redirect URL:
+
+```text
+https://joanesplazaola.github.io/erregularizazioa/private.html
+```
+
+4. En **Authentication → Users**, invita manualmente a las personas del equipo.
+5. Los datos del cliente web viven en `pages/config.js`.
+
+Con la configuracion actual, solo las personas autenticadas pueden leer y escribir casos en la tabla compartida.
+
 ---
 
 ## Estructura del proyecto
@@ -68,8 +92,12 @@ https://joanesplazaola.github.io/erregularizazioa/
 | `styles.css` | Diseño visual |
 | `logic.js` | Logica pura de elegibilidad y generacion de checklists (sin dependencias, testeable en Node) |
 | `app.js` | Controlador de la UI: conecta la logica con el DOM y la API de Electron |
+| `pages/public-index.html` | Landing publica para GitHub Pages |
+| `pages/supabase-web.js` | Capa web privada: login con Supabase y CRUD compartido |
+| `pages/config.js` | URL y clave publica del proyecto Supabase |
 | `.github/workflows/deploy-pages.yml` | Workflow que construye `dist/pages/` y lo despliega en GitHub Pages |
 | `scripts/build-pages.js` | Copia la UI compartida a `dist/pages/` para publicar una version estatica |
+| `supabase/schema.sql` | Esquema y politicas RLS para la base centralizada en Supabase |
 | `translations.js` | Traducciones ES/FR usadas por la UI |
 | `tests/logic.test.js` | Tests de logica pura |
 | `tests/app.test.js` | Tests DOM/integracion con jsdom |

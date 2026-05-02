@@ -11,7 +11,7 @@
     "build:mac:x64": "electron-builder --mac zip --x64",
     "build:mac:arm64": "electron-builder --mac zip --arm64",
     "build:linux": "electron-builder --linux",
-    "test:unit": "node --test tests/app.test.js tests/logic.test.js tests/db.test.js",
+    "test:unit": "node --test tests/app.test.js tests/logic.test.js tests/db.test.js tests/build-pages.test.js",
     "test:e2e": "playwright test",
     "test": "npm run test:unit && npm run test:e2e"
   },
