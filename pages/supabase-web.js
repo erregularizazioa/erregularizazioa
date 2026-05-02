@@ -71,7 +71,7 @@
   async function requireSession() {
     var session = await getSession();
     if (!session) {
-      throw new Error("Necesitas iniciar sesion para acceder a los casos.");
+      throw new Error("Necesitas iniciar sesión para acceder a los casos.");
     }
     return session;
   }
@@ -196,7 +196,7 @@
       var session = await getSession();
       setLoggedInState(session);
       if (!session) {
-        setAuthMessage("Inicia sesion con tu correo y contrasena para abrir el area privada.", "info");
+        setAuthMessage("Inicia sesión con tu correo y contraseña para abrir el área privada.", "info");
       } else {
         setAuthMessage("", "info");
       }
@@ -218,7 +218,7 @@
         return;
       }
       if (!password) {
-        setAuthMessage("Escribe la contrasena.", "error");
+        setAuthMessage("Escribe la contraseña.", "error");
         return;
       }
 
@@ -245,7 +245,7 @@
   supabaseClient.auth.onAuthStateChange(function(event, session) {
     setLoggedInState(session || null);
     if (!session) {
-      setAuthMessage("Inicia sesion con tu correo y contrasena para abrir el area privada.", "info");
+      setAuthMessage("Inicia sesión con tu correo y contraseña para abrir el área privada.", "info");
     }
   });
 
