@@ -163,15 +163,97 @@ test("bloquea la orientacion automatica si la persona figura como rechazable", (
   assert.match(result.summary, /revision especializada|rechazable/i);
 });
 
+test("valida un paquete controlado de casos realistas", () => {
+  const cases = [
+    {
+      name: "PI previa con documentacion completa",
+      answers: baseAnswers({ piBefore2026: "yes", irregularOptions: [] }),
+      expectedRoute: "Proteccion Internacional",
+      expectedTone: "ok",
+      expectedDocs: ["doc-form-pi-ex31", "doc-pi-proof", "doc-fee-790-052"],
+      expectedSteps: ["step-provisional-permit", "step-pi-desist"]
+    },
+    {
+      name: "Irregularidad por trabajo con penales pendientes",
+      answers: baseAnswers({ irregularOptions: ["work"], criminalRecord: "unsure" }),
+      expectedRoute: "Situacion administrativa irregular",
+      expectedTone: "warn",
+      expectedDocs: ["doc-form-irregular-ex32", "doc-work-proof"],
+      expectedSteps: ["step-filing-window", "step-expulsion-review"]
+    },
+    {
+      name: "Menor nacido en Espana con progenitor regular",
+      answers: minorAnswers({ minorBirthPlace: "spain", minorGuardianStatus: "regular" }),
+      expectedRoute: "Menor nacido en Espana con progenitor/tutor regular",
+      expectedTone: "warn",
+      expectedDocs: ["doc-form-minor-ex25", "doc-minor-birth-cert-spain", "doc-minor-guardian-regular-status"],
+      expectedSteps: ["step-minor-regular-route", "step-minor-regular-filing"]
+    },
+    {
+      name: "Menor nacido en el extranjero con progenitor irregular y custodia",
+      answers: minorAnswers({
+        minorBirthPlace: "abroad",
+        minorGuardianStatus: "irregular",
+        minorNeedsCustodyProof: "yes",
+        minorSchoolingRequired: "yes"
+      }),
+      expectedRoute: "Menor nacido en el extranjero con progenitor/tutor irregular",
+      expectedTone: "warn",
+      expectedDocs: ["doc-form-minor-ex31-ex32", "doc-minor-birth-cert-abroad", "doc-minor-custody-proof"],
+      expectedSteps: ["step-minor-irregular-filing", "step-minor-irregular-follow-up"]
+    },
+    {
+      name: "Caso con compromiso de no retorno",
+      answers: baseAnswers({ nonReturnCommitment: "yes" }),
+      expectedRoute: "Otra via",
+      expectedTone: "stop",
+      expectedDocs: [],
+      expectedSteps: []
+    }
+  ];
+
+  cases.forEach((caseItem) => {
+    const guidance = logic.buildCaseGuidance(caseItem.answers, {});
+    assert.equal(guidance.result.routeLabel, caseItem.expectedRoute, caseItem.name);
+    assert.equal(guidance.result.tone, caseItem.expectedTone, caseItem.name);
+
+    caseItem.expectedDocs.forEach((docKey) => {
+      assert.ok(
+        guidance.documents.some((item) => item.key === docKey),
+        caseItem.name + " should include document " + docKey
+      );
+    });
+
+    caseItem.expectedSteps.forEach((stepKey) => {
+      assert.ok(
+        guidance.steps.some((item) => item.key === stepKey),
+        caseItem.name + " should include step " + stepKey
+      );
+    });
+  });
+});
+
 test("normaliza una ficha conservando respuestas y checks", () => {
   const caseItem = logic.normalizeCase({
     id: "REG-2026-00001",
     caseName: "Caso demo",
+    representativeName: "Entidad apoyo",
+    notificationTarget: "representante",
+    presentationByCollaborator: "yes",
+    presentationPresenter: "Compa con certificado",
+    presentationMercurioReady: "yes",
+    presentationRegistryNumber: "REGISTRO-33",
     answers: { piBefore2026: "yes", identityDocument: "yes" },
     checks: { "doc-form": 1 }
   });
 
   assert.equal(caseItem.id, "REG-2026-00001");
+  assert.equal(caseItem.representativeName, "Entidad apoyo");
+  assert.equal(caseItem.notificationTarget, "representante");
+  assert.equal(caseItem.presentationByCollaborator, "yes");
+  assert.equal(caseItem.presentationPresenter, "Compa con certificado");
+  assert.equal(caseItem.presentationMercurioReady, "yes");
+  assert.equal(caseItem.presentationRegistryNumber, "REGISTRO-33");
   assert.equal(caseItem.answers.piBefore2026, "yes");
   assert.equal(caseItem.answers.identityDocument, "yes");
   assert.equal(caseItem.checks["doc-form"], true);
@@ -233,4 +315,20 @@ test("genera CSV con columnas de pendientes y proximo paso", () => {
   assert.match(csv, /"Documentos pendientes"/);
   assert.match(csv, /"Pasaporte \| Penales"/);
   assert.match(csv, /"Revisar ""penales"""/);
+});
+
+test("normaliza representantes reutilizables y conserva el enlace en el caso", () => {
+  const representative = logic.normalizeRepresentative({
+    name: "Entidad amiga",
+    phone: "600111222",
+    email: "entidad@ejemplo.org"
+  });
+  const caseItem = logic.normalizeCase({
+    caseName: "Caso con enlace",
+    representativeId: "REP-00003"
+  });
+
+  assert.equal(representative.name, "Entidad amiga");
+  assert.equal(representative.phone, "600111222");
+  assert.equal(caseItem.representativeId, "REP-00003");
 });

@@ -8,6 +8,7 @@ async function openApp(page, options = {}) {
   await page.addInitScript((initOptions) => {
     const cases = [...(initOptions.cases || [])];
     const restoredCases = [...(initOptions.restoreCases || [])];
+    const representatives = [...(initOptions.representatives || [])];
 
     window.__copiedText = "";
     Object.defineProperty(window.navigator, "clipboard", {
@@ -21,6 +22,14 @@ async function openApp(page, options = {}) {
 
     window.electronAPI = {
       getCases: async () => cases.map((c) => ({ ...c })),
+      getRepresentatives: async () => representatives.map((r) => ({ ...r })),
+      saveRepresentative: async (representative) => {
+        const saved = { ...representative, id: representative.id || "REP-00001" };
+        const index = representatives.findIndex((item) => item.id === saved.id);
+        if (index >= 0) representatives[index] = saved;
+        else representatives.push(saved);
+        return saved;
+      },
       saveCase: async (c) => {
         const saved = { ...c, id: c.id || "REG-2026-00001" };
         const index = cases.findIndex((item) => item.id === saved.id);
@@ -53,6 +62,25 @@ test("saves a case and shows the generated ID", async ({ page }) => {
 
   await expect(page.locator("#case-id-preview")).toContainText("REG-2026-00001");
   await expect(page.locator("#case-table-body")).toContainText("Persona E2E");
+});
+
+test("saved representatives can be reused in another case", async ({ page }) => {
+  await openApp(page);
+
+  await page.locator("#representative-directory-panel summary").click();
+  await page.locator("#representative-directory-name").fill("Entidad amiga");
+  await page.locator("#representative-directory-phone").fill("600111222");
+  await page.locator("#representative-directory-email").fill("entidad@ejemplo.org");
+  await page.getByRole("button", { name: /guardar ficha|guardar representante/i }).click();
+
+  await expect(page.locator("#representative-directory-select")).toHaveValue("REP-00001");
+  await page.locator("#clear-case-button").click();
+  await page.locator("#case-representative-profile").selectOption("REP-00001");
+
+  await expect(page.locator("#case-representative-name")).toHaveValue("Entidad amiga");
+  await expect(page.locator("#case-representative-phone")).toHaveValue("600111222");
+  await expect(page.locator("#case-representative-email")).toHaveValue("entidad@ejemplo.org");
+  await expect(page.locator("#case-representative-name")).toHaveJSProperty("readOnly", true);
 });
 
 test("loads a read-only static mode when Electron is unavailable", async ({ page }) => {
@@ -110,7 +138,7 @@ test("wizard stops after the first hard gate when presence cannot be proven", as
 
   await page.locator("#step-next").click();
   await expect(page.locator("#step-progress-label")).toContainText(/Paso 2|Étape 2/);
-  await expect(page.locator("#step-next")).toContainText(/Ver diagnostico/i);
+  await expect(page.locator("#step-next")).toContainText(/Ver diagn[oó]stico/i);
 
   await page.locator("#step-next").click();
 
@@ -146,7 +174,7 @@ test("summary row renders as compact pills", async ({ page }) => {
     cases: [{ id: "REG-2026-00001", caseName: "Persona", caseStatus: "Nuevo", nextAction: "Llamar", locality: "Bergara" }]
   });
 
-  await expect(page.locator(".summary-pill")).toHaveCount(5);
+  await expect(page.locator(".summary-pill")).toHaveCount(6);
   await expect(page.locator(".summary-card")).toHaveCount(0);
 });
 

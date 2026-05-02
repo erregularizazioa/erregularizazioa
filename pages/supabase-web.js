@@ -43,7 +43,9 @@
     setAuthMessage("Falta configurar Supabase antes de usar el area privada.", "error");
     window.electronAPI = {
       getCases: async function() { return []; },
+      getRepresentatives: async function() { return []; },
       getNextId: async function() { throw missingConfigError(); },
+      saveRepresentative: async function() { throw missingConfigError(); },
       saveCase: async function() { throw missingConfigError(); },
       exportExcel: async function() { return { ok: false, reason: "desktop-only" }; },
       backupDatabase: async function() { return { ok: false, reason: "desktop-only" }; },
@@ -78,6 +80,10 @@
     return logic.normalizeCase((row && row.payload) || {});
   }
 
+  function normalizeSavedRepresentative(row) {
+    return logic.normalizeRepresentative((row && row.payload) || {});
+  }
+
   window.electronAPI = {
     getCases: async function() {
       var session = await getSession();
@@ -92,11 +98,59 @@
       return (result.data || []).map(normalizeSavedCase);
     },
 
+    getRepresentatives: async function() {
+      var session = await getSession();
+      if (!session) return [];
+
+      var result = await supabaseClient
+        .from("app_representatives")
+        .select("payload, updated_at")
+        .order("updated_at", { ascending: false });
+
+      if (result.error) throw result.error;
+      return (result.data || []).map(normalizeSavedRepresentative);
+    },
+
     getNextId: async function() {
       await requireSession();
       var result = await supabaseClient.rpc("next_case_id");
       if (result.error) throw result.error;
       return result.data;
+    },
+
+    saveRepresentative: async function(representativeData) {
+      var session = await requireSession();
+      var normalized = logic.normalizeRepresentative(representativeData);
+      var now = new Date().toISOString();
+
+      if (!normalized.name) {
+        throw new Error("El representante necesita al menos un nombre.");
+      }
+
+      var id = normalized.id || (
+        window.crypto && typeof window.crypto.randomUUID === "function"
+          ? "REP-" + window.crypto.randomUUID()
+          : "REP-" + now.replace(/\D/g, "").slice(-12) + "-" + Math.random().toString(36).slice(2, 6).toUpperCase()
+      );
+      var row = {
+        id: id,
+        payload: Object.assign({}, normalized, {
+          id: id,
+          updatedAt: now
+        }),
+        created_at: now,
+        updated_at: now,
+        updated_by: session.user.id
+      };
+
+      var result = await supabaseClient
+        .from("app_representatives")
+        .upsert(row, { onConflict: "id" })
+        .select("payload")
+        .single();
+
+      if (result.error) throw result.error;
+      return normalizeSavedRepresentative(result.data);
     },
 
     saveCase: async function(caseData) {

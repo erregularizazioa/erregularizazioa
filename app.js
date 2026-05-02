@@ -8,16 +8,33 @@ const isStaticMode = appMode === "static";
 const isWebPrivateMode = appMode === "web-private";
 const supportsCaseStorage = !isStaticMode;
 const supportsDesktopOnlyTools = appMode === "desktop";
-const api = !isStaticMode && window.electronAPI
-  ? window.electronAPI
-  : {
-      getCases: async function() { return []; },
-      getNextId: async function() { throw new Error("read-only"); },
-      saveCase: async function() { throw new Error("read-only"); },
-      exportExcel: async function() { throw new Error("read-only"); },
-      backupDatabase: async function() { throw new Error("read-only"); },
-      restoreDatabase: async function() { throw new Error("read-only"); }
-    };
+const electronApi = !isStaticMode && window.electronAPI ? window.electronAPI : null;
+const api = {
+  getCases: electronApi && typeof electronApi.getCases === "function"
+    ? electronApi.getCases.bind(electronApi)
+    : async function() { return []; },
+  getRepresentatives: electronApi && typeof electronApi.getRepresentatives === "function"
+    ? electronApi.getRepresentatives.bind(electronApi)
+    : async function() { return []; },
+  getNextId: electronApi && typeof electronApi.getNextId === "function"
+    ? electronApi.getNextId.bind(electronApi)
+    : async function() { throw new Error("read-only"); },
+  saveRepresentative: electronApi && typeof electronApi.saveRepresentative === "function"
+    ? electronApi.saveRepresentative.bind(electronApi)
+    : async function() { throw new Error("read-only"); },
+  saveCase: electronApi && typeof electronApi.saveCase === "function"
+    ? electronApi.saveCase.bind(electronApi)
+    : async function() { throw new Error("read-only"); },
+  exportExcel: electronApi && typeof electronApi.exportExcel === "function"
+    ? electronApi.exportExcel.bind(electronApi)
+    : async function() { throw new Error("read-only"); },
+  backupDatabase: electronApi && typeof electronApi.backupDatabase === "function"
+    ? electronApi.backupDatabase.bind(electronApi)
+    : async function() { throw new Error("read-only"); },
+  restoreDatabase: electronApi && typeof electronApi.restoreDatabase === "function"
+    ? electronApi.restoreDatabase.bind(electronApi)
+    : async function() { throw new Error("read-only"); }
+};
 
 const caseForm              = document.getElementById("case-form");
 const caseIdField           = document.getElementById("case-id");
@@ -28,10 +45,26 @@ const casePhoneField        = document.getElementById("case-phone");
 const caseEmailField        = document.getElementById("case-email");
 const caseLocalityField     = document.getElementById("case-locality");
 const caseVolunteerField    = document.getElementById("case-volunteer");
+const caseRepresentativeProfileField = document.getElementById("case-representative-profile");
+const caseRepresentativeModeHint = document.getElementById("case-representative-mode-hint");
+const representativeDirectoryPanel = document.getElementById("representative-directory-panel");
+const representativeDirectorySelectField = document.getElementById("representative-directory-select");
+const representativeDirectoryNameField = document.getElementById("representative-directory-name");
+const representativeDirectoryPhoneField = document.getElementById("representative-directory-phone");
+const representativeDirectoryEmailField = document.getElementById("representative-directory-email");
+const newRepresentativeButton = document.getElementById("new-representative-button");
+const saveRepresentativeButton = document.getElementById("save-representative-button");
 const caseRepresentativeNameField  = document.getElementById("case-representative-name");
 const caseRepresentativePhoneField = document.getElementById("case-representative-phone");
 const caseRepresentativeEmailField = document.getElementById("case-representative-email");
 const caseNotificationTargetField  = document.getElementById("case-notification-target");
+const casePresentationByCollaboratorField = document.getElementById("case-presentation-by-collaborator");
+const casePresentationPresenterField = document.getElementById("case-presentation-presenter");
+const casePresentationAuthorizationSignedField = document.getElementById("case-presentation-authorization-signed");
+const casePresentationDocumentsReadyField = document.getElementById("case-presentation-documents-ready");
+const casePresentationMercurioReadyField = document.getElementById("case-presentation-mercurio-ready");
+const casePresentationDateField = document.getElementById("case-presentation-date");
+const casePresentationRegistryNumberField = document.getElementById("case-presentation-registry-number");
 const caseNextDateField     = document.getElementById("case-next-date");
 const caseNextActionField   = document.getElementById("case-next-action");
 const caseNotesField        = document.getElementById("case-notes");
@@ -66,6 +99,7 @@ let currentStep = 1;
 let currentChecks = {};
 let lastSuggestedAction = "";
 let casesState = [];
+let representativesState = [];
 let currentLang = localStorage.getItem("regularizazioa-lang") || "es";
 let urgentFilterActive = false;
 
@@ -110,6 +144,8 @@ function applyLanguage() {
   });
   document.getElementById("lang-es").classList.toggle("active", currentLang === "es");
   document.getElementById("lang-fr").classList.toggle("active", currentLang === "fr");
+  renderRepresentativeSelectors(getFieldValue(caseRepresentativeProfileField), getFieldValue(representativeDirectorySelectField));
+  updateRepresentativeModeHint(getRepresentativeById(getFieldValue(caseRepresentativeProfileField)));
   applyRuntimeText();
   showAnalysisStep(currentStep);
   renderGuidance();
@@ -139,6 +175,7 @@ function applyRuntimeMode() {
 
   if (isStaticMode) {
     if (saveCaseButton) saveCaseButton.classList.add("hidden");
+    if (representativeDirectoryPanel) representativeDirectoryPanel.classList.add("hidden");
     if (autosaveIndicator) autosaveIndicator.classList.add("hidden");
     if (caseIdPreview) {
       caseIdPreview.textContent = "";
@@ -174,6 +211,209 @@ function formatDate(dateValue) {
 function fileNameFromPath(filePath) {
   if (!filePath) return "";
   return String(filePath).split(/[\\/]/).pop();
+}
+
+function representativeLabel(representative) {
+  return [representative.name, representative.phone || representative.email].filter(Boolean).join(" · ");
+}
+
+function getRepresentativeById(representativeId) {
+  return representativesState.find(function(item) {
+    return item.id === representativeId;
+  }) || null;
+}
+
+function applyRepresentativeToForm(representative) {
+  if (!representative) return;
+  setFieldValue(caseRepresentativeNameField, representative.name || "");
+  setFieldValue(caseRepresentativePhoneField, representative.phone || "");
+  setFieldValue(caseRepresentativeEmailField, representative.email || "");
+}
+
+function buildRepresentativeOptionsHtml(emptyLabelKey) {
+  return '<option value="">' + escapeHtml(t(emptyLabelKey)) + "</option>" +
+    representativesState.map(function(representative) {
+      return '<option value="' + escapeHtml(representative.id) + '">' + escapeHtml(representativeLabel(representative)) + "</option>";
+    }).join("");
+}
+
+function renderRepresentativeSelectors(caseSelectedId, directorySelectedId) {
+  if (caseRepresentativeProfileField) {
+    var caseValue = typeof caseSelectedId === "string" ? caseSelectedId : getFieldValue(caseRepresentativeProfileField);
+    caseRepresentativeProfileField.innerHTML = buildRepresentativeOptionsHtml("field.representativeProfile.empty");
+    setFieldValue(caseRepresentativeProfileField, getRepresentativeById(caseValue) ? caseValue : "");
+  }
+
+  if (representativeDirectorySelectField) {
+    var directoryValue = typeof directorySelectedId === "string" ? directorySelectedId : getFieldValue(representativeDirectorySelectField);
+    representativeDirectorySelectField.innerHTML = buildRepresentativeOptionsHtml("representatives.directory.select.empty");
+    setFieldValue(representativeDirectorySelectField, getRepresentativeById(directoryValue) ? directoryValue : "");
+  }
+}
+
+function setRepresentativeFieldsLocked(locked) {
+  [caseRepresentativeNameField, caseRepresentativePhoneField, caseRepresentativeEmailField].forEach(function(field) {
+    if (!field) return;
+    field.readOnly = Boolean(locked);
+    field.classList.toggle("is-linked", Boolean(locked));
+  });
+}
+
+function updateRepresentativeModeHint(representative) {
+  if (!caseRepresentativeModeHint) return;
+  caseRepresentativeModeHint.textContent = representative
+    ? t("field.representativeData.hint.linked")
+    : t("field.representativeData.hint.manual");
+}
+
+function syncCaseRepresentativeSelection(representativeId, options) {
+  var keepExistingFields = options && options.keepExistingFields;
+  var representative = getRepresentativeById(representativeId);
+  renderRepresentativeSelectors(representative ? representative.id : "", getFieldValue(representativeDirectorySelectField));
+
+  if (representative) {
+    applyRepresentativeToForm(representative);
+    setRepresentativeFieldsLocked(true);
+    updateRepresentativeModeHint(representative);
+    return representative;
+  }
+
+  if (!keepExistingFields) {
+    setFieldValue(caseRepresentativeNameField, "");
+    setFieldValue(caseRepresentativePhoneField, "");
+    setFieldValue(caseRepresentativeEmailField, "");
+  }
+  setRepresentativeFieldsLocked(false);
+  updateRepresentativeModeHint(null);
+  return null;
+}
+
+function populateRepresentativeDirectoryForm(representative) {
+  if (representativeDirectorySelectField) {
+    setFieldValue(representativeDirectorySelectField, representative ? representative.id : "");
+  }
+  setFieldValue(representativeDirectoryNameField, representative ? representative.name : "");
+  setFieldValue(representativeDirectoryPhoneField, representative ? representative.phone : "");
+  setFieldValue(representativeDirectoryEmailField, representative ? representative.email : "");
+}
+
+function collectRepresentativeDirectoryFormData() {
+  return {
+    id: getFieldValue(representativeDirectorySelectField).trim(),
+    name: getFieldValue(representativeDirectoryNameField).trim(),
+    phone: getFieldValue(representativeDirectoryPhoneField).trim(),
+    email: getFieldValue(representativeDirectoryEmailField).trim()
+  };
+}
+
+function hydrateCase(caseItem) {
+  var normalized = logic.normalizeCase(caseItem);
+  if (!normalized.representativeId) return normalized;
+
+  var representative = getRepresentativeById(normalized.representativeId);
+  if (!representative) return normalized;
+
+  return logic.normalizeCase(Object.assign({}, normalized, {
+    representativeName: representative.name || normalized.representativeName,
+    representativePhone: representative.phone || normalized.representativePhone,
+    representativeEmail: representative.email || normalized.representativeEmail
+  }));
+}
+
+function hydrateCases(cases) {
+  return (cases || []).map(hydrateCase);
+}
+
+function findMatchingRepresentative(representativeData) {
+  return representativesState.find(function(item) {
+    return item.name === representativeData.name &&
+      item.phone === representativeData.phone &&
+      item.email === representativeData.email;
+  }) || null;
+}
+
+async function refreshRepresentatives(caseSelectedId, directorySelectedId) {
+  representativesState = await api.getRepresentatives();
+  renderRepresentativeSelectors(caseSelectedId, directorySelectedId);
+}
+
+async function saveRepresentativeProfile(representativeData, options) {
+  var silent = options && options.silent;
+  var normalized = logic.normalizeRepresentative(representativeData);
+
+  if (!normalized.name) {
+    if (!silent) {
+      setStorageMessage(t("error.representative.name"), "error");
+      focusField(representativeDirectoryNameField || caseRepresentativeNameField);
+    }
+    return null;
+  }
+
+  if (!normalized.id) {
+    var existing = findMatchingRepresentative(normalized);
+    if (existing) {
+      renderRepresentativeOptions(existing.id);
+      setFieldValue(caseRepresentativeProfileField, existing.id);
+      applyRepresentativeToForm(existing);
+      if (!silent) {
+        setStorageMessage(t("msg.representative.linked.format").replace("{name}", existing.name), "success");
+      }
+      return existing;
+    }
+  }
+
+  var saved = await api.saveRepresentative(normalized);
+  await refreshRepresentatives(getFieldValue(caseRepresentativeProfileField), saved.id);
+  populateRepresentativeDirectoryForm(saved);
+
+  if (getFieldValue(caseRepresentativeProfileField) === saved.id) {
+    syncCaseRepresentativeSelection(saved.id, { keepExistingFields: true });
+  }
+
+  if (!silent) {
+    setStorageMessage(t("msg.representative.saved.format").replace("{name}", saved.name), "success");
+  }
+  return saved;
+}
+
+function presentationChoiceLabel(value) {
+  return t("prep.choice." + (value || "review"));
+}
+
+function isPresentationSubmitted(caseItem) {
+  return Boolean(caseItem.presentationDate || caseItem.presentationRegistryNumber || ["Presentada", "Inicio recibido", "Favorable"].includes(caseItem.caseStatus));
+}
+
+function getPresentationBadge(caseItem) {
+  if (isPresentationSubmitted(caseItem)) {
+    return {
+      tone: "submitted",
+      label: t("presentation.badge.submitted"),
+      detail: caseItem.presentationRegistryNumber || (caseItem.presentationDate ? formatDate(caseItem.presentationDate) : "")
+    };
+  }
+
+  if (caseItem.presentationMercurioReady === "yes") {
+    return {
+      tone: "ready",
+      label: t("presentation.badge.ready"),
+      detail: caseItem.presentationPresenter || ""
+    };
+  }
+
+  if (caseItem.presentationByCollaborator === "no") {
+    return {
+      tone: "no-collaborator",
+      label: t("presentation.badge.noCollaborator"),
+      detail: ""
+    };
+  }
+
+  return {
+    tone: "review",
+    label: t("presentation.badge.review"),
+    detail: caseItem.presentationPresenter || ""
+  };
 }
 
 // Analysis wizard
@@ -379,10 +619,18 @@ function collectCaseFormData() {
     email:      caseEmailField.value.trim(),
     locality:   caseLocalityField.value.trim(),
     volunteer:  caseVolunteerField.value.trim(),
+    representativeId: getFieldValue(caseRepresentativeProfileField).trim(),
     representativeName: getFieldValue(caseRepresentativeNameField).trim(),
     representativePhone: getFieldValue(caseRepresentativePhoneField).trim(),
     representativeEmail: getFieldValue(caseRepresentativeEmailField).trim(),
     notificationTarget: getFieldValue(caseNotificationTargetField, "persona"),
+    presentationByCollaborator: getFieldValue(casePresentationByCollaboratorField).trim(),
+    presentationPresenter: getFieldValue(casePresentationPresenterField).trim(),
+    presentationAuthorizationSigned: getFieldValue(casePresentationAuthorizationSignedField).trim(),
+    presentationDocumentsReady: getFieldValue(casePresentationDocumentsReadyField).trim(),
+    presentationMercurioReady: getFieldValue(casePresentationMercurioReadyField).trim(),
+    presentationDate: getFieldValue(casePresentationDateField).trim(),
+    presentationRegistryNumber: getFieldValue(casePresentationRegistryNumberField).trim(),
     caseStatus: getRadioValue("caseStatus") || "Nuevo",
     nextDate:   caseNextDateField.value.trim(),
     nextAction: caseNextActionField.value.trim(),
@@ -497,6 +745,13 @@ function buildCaseSummaryText() {
     t("field.status") + ": " + (formData.caseStatus || "-"),
     t("field.notificationTarget") + ": " + t("notificationTarget." + (formData.notificationTarget || "persona")),
     t("field.representativeName") + ": " + (formData.representativeName || "-"),
+    t("field.presentationByCollaborator") + ": " + presentationChoiceLabel(formData.presentationByCollaborator),
+    t("field.presentationPresenter") + ": " + (formData.presentationPresenter || "-"),
+    t("field.presentationAuthorizationSigned") + ": " + presentationChoiceLabel(formData.presentationAuthorizationSigned),
+    t("field.presentationDocumentsReady") + ": " + presentationChoiceLabel(formData.presentationDocumentsReady),
+    t("field.presentationMercurioReady") + ": " + presentationChoiceLabel(formData.presentationMercurioReady),
+    t("field.presentationDate") + ": " + (formData.presentationDate ? formatDate(formData.presentationDate) : "-"),
+    t("field.presentationRegistryNumber") + ": " + (formData.presentationRegistryNumber || "-"),
     t("field.nextDate") + ": " + (formData.nextDate ? formatDate(formData.nextDate) : "-"),
     t("field.nextAction") + ": " + (caseNextActionField.value.trim() || guidance.recommendedAction || "-"),
     t("guidance.pending.docs") + ": " + guidance.documentsPendingSummary,
@@ -511,11 +766,13 @@ function renderCaseSummaryCards(cases) {
   var openCount     = cases.filter(function(c) { return !["Favorable","Desfavorable","Cerrada"].includes(c.caseStatus); }).length;
   var submittedCount = cases.filter(function(c) { return ["Presentada","Inicio recibido","Favorable"].includes(c.caseStatus); }).length;
   var favorableCount = cases.filter(function(c) { return c.caseStatus === "Favorable"; }).length;
+  var presentationReadyCount = cases.filter(function(c) { return c.presentationMercurioReady === "yes"; }).length;
   var overdueCount  = cases.filter(isOverdue).length;
   caseSummary.innerHTML =
     '<div class="summary-pill"><span>' + escapeHtml(t("summary.total"))     + '</span><strong>' + cases.length     + "</strong></div>" +
     '<div class="summary-pill"><span>' + escapeHtml(t("summary.open"))      + '</span><strong>' + openCount        + "</strong></div>" +
     '<div class="summary-pill"><span>' + escapeHtml(t("summary.submitted")) + '</span><strong>' + submittedCount   + "</strong></div>" +
+    '<div class="summary-pill"><span>' + escapeHtml(t("summary.presentationReady")) + '</span><strong>' + presentationReadyCount + "</strong></div>" +
     '<div class="summary-pill"><span>' + escapeHtml(t("summary.favorable")) + '</span><strong>' + favorableCount   + "</strong></div>" +
     '<div class="summary-pill ' + (overdueCount > 0 ? "overdue" : "") + '"><span>' + escapeHtml(t("summary.overdue")) + '</span><strong>' + overdueCount + "</strong></div>";
 }
@@ -529,7 +786,10 @@ function getFilteredCases() {
     var haystack = [
       c.id, c.caseName, c.phone, c.email, c.locality, c.volunteer,
       c.representativeName, c.representativePhone, c.representativeEmail,
-      c.notificationTarget, c.route, c.nextAction
+      c.notificationTarget, c.presentationByCollaborator, c.presentationPresenter,
+      c.presentationAuthorizationSigned, c.presentationDocumentsReady,
+      c.presentationMercurioReady, c.presentationRegistryNumber,
+      c.route, c.nextAction
     ]
       .join(" ").toLowerCase();
     return matchesStatus && matchesUrgent && (!search || haystack.includes(search));
@@ -574,6 +834,14 @@ function formatNextDate(dateStr, overdue) {
     : escapeHtml(formatted);
 }
 
+function renderPresentationCell(caseItem) {
+  var badge = getPresentationBadge(caseItem);
+  var detail = badge.detail
+    ? '<br><span class="note">' + escapeHtml(truncate(badge.detail, 28)) + "</span>"
+    : "";
+  return '<span class="prep-badge-pill prep-' + escapeHtml(badge.tone) + '">' + escapeHtml(badge.label) + "</span>" + detail;
+}
+
 function renderCaseTable() {
   var filtered = getFilteredCases();
   renderCaseSummaryCards(casesState);
@@ -586,6 +854,7 @@ function renderCaseTable() {
         '<span class="note">' + escapeHtml(c.phone || c.email || "-") + "</span></td>" +
       "<td>" + routeBadge(c.route || "-") + "</td>" +
       "<td>" + escapeHtml(c.caseStatus || "-") + "</td>" +
+      "<td>" + renderPresentationCell(c) + "</td>" +
       "<td>" + formatNextDate(c.nextDate, overdue) + "</td>" +
       "<td>" + escapeHtml(truncate(c.nextAction, 60)) + "</td>" +
       "<td>" + escapeHtml(c.volunteer || "-") + "</td>" +
@@ -603,10 +872,15 @@ function clearCaseForm() {
   caseIdPreview.textContent = "";
   caseIdPreview.classList.add("hidden");
   caseLocalityField.value   = "Bergara";
-  setFieldValue(caseRepresentativeNameField, "");
-  setFieldValue(caseRepresentativePhoneField, "");
-  setFieldValue(caseRepresentativeEmailField, "");
+  syncCaseRepresentativeSelection("", { keepExistingFields: false });
   setFieldValue(caseNotificationTargetField, "persona");
+  setFieldValue(casePresentationByCollaboratorField, "");
+  setFieldValue(casePresentationPresenterField, "");
+  setFieldValue(casePresentationAuthorizationSignedField, "");
+  setFieldValue(casePresentationDocumentsReadyField, "");
+  setFieldValue(casePresentationMercurioReadyField, "");
+  setFieldValue(casePresentationDateField, "");
+  setFieldValue(casePresentationRegistryNumberField, "");
   setRadioValue("caseStatus", "Nuevo");
   document.getElementById("phone-error").classList.add("hidden");
   document.getElementById("email-error").classList.add("hidden");
@@ -618,7 +892,7 @@ function clearCaseForm() {
 }
 
 function populateCaseForm(caseItem) {
-  var c = logic.normalizeCase(caseItem);
+  var c = hydrateCase(caseItem);
   caseIdField.value           = c.id;
   caseIdPreview.textContent   = c.id;
   caseIdPreview.classList.remove("hidden");
@@ -632,7 +906,15 @@ function populateCaseForm(caseItem) {
   setFieldValue(caseRepresentativeNameField, c.representativeName || "");
   setFieldValue(caseRepresentativePhoneField, c.representativePhone || "");
   setFieldValue(caseRepresentativeEmailField, c.representativeEmail || "");
+  syncCaseRepresentativeSelection(c.representativeId || "", { keepExistingFields: true });
   setFieldValue(caseNotificationTargetField, c.notificationTarget || "persona");
+  setFieldValue(casePresentationByCollaboratorField, c.presentationByCollaborator || "");
+  setFieldValue(casePresentationPresenterField, c.presentationPresenter || "");
+  setFieldValue(casePresentationAuthorizationSignedField, c.presentationAuthorizationSigned || "");
+  setFieldValue(casePresentationDocumentsReadyField, c.presentationDocumentsReady || "");
+  setFieldValue(casePresentationMercurioReadyField, c.presentationMercurioReady || "");
+  setFieldValue(casePresentationDateField, c.presentationDate || "");
+  setFieldValue(casePresentationRegistryNumberField, c.presentationRegistryNumber || "");
   setRadioValue("caseStatus", c.caseStatus || "Nuevo");
   caseNextDateField.value     = c.nextDate;
   caseNotesField.value        = c.notes;
@@ -710,8 +992,49 @@ guidanceSteps.addEventListener("change", function(event) {
   renderGuidance();
 });
 
+if (caseRepresentativeProfileField) {
+  caseRepresentativeProfileField.addEventListener("change", function() {
+    var representative = syncCaseRepresentativeSelection(this.value, { keepExistingFields: true });
+    if (representative) {
+      setStorageMessage(t("msg.representative.linked.format").replace("{name}", representative.name), "info");
+    } else {
+      clearStorageMessage();
+    }
+  });
+}
+
 clearCaseButton.addEventListener("click", clearCaseForm);
 printButton.addEventListener("click", function() { window.print(); });
+
+if (representativeDirectorySelectField) {
+  representativeDirectorySelectField.addEventListener("change", function() {
+    populateRepresentativeDirectoryForm(getRepresentativeById(this.value));
+  });
+}
+
+if (newRepresentativeButton) {
+  newRepresentativeButton.addEventListener("click", function() {
+    populateRepresentativeDirectoryForm(null);
+    if (representativeDirectoryPanel) representativeDirectoryPanel.open = true;
+  });
+}
+
+if (saveRepresentativeButton) {
+  saveRepresentativeButton.addEventListener("click", async function() {
+    if (!supportsCaseStorage) {
+      setStorageMessage(t("msg.static.readOnly"), "info");
+      return;
+    }
+
+    clearStorageMessage();
+    try {
+      if (representativeDirectoryPanel) representativeDirectoryPanel.open = true;
+      await saveRepresentativeProfile(collectRepresentativeDirectoryFormData(), { silent: false });
+    } catch (err) {
+      setStorageMessage("Error al guardar el representante: " + err.message, "error");
+    }
+  });
+}
 
 exportExcelButton.addEventListener("click", async function() {
   if (!supportsDesktopOnlyTools) {
@@ -766,7 +1089,7 @@ restoreButton.addEventListener("click", async function() {
       }
       return;
     }
-    casesState = await api.getCases();
+    casesState = hydrateCases(await api.getCases());
     clearCaseForm();
     renderCaseTable();
     var restoreMsg = t("msg.restore.done.format").replace("{name}", fileNameFromPath(result.path));
@@ -808,6 +1131,14 @@ async function performSave(options) {
     return;
   }
 
+  if (formData.representativeId && !getRepresentativeById(formData.representativeId)) {
+    if (!silent) {
+      setStorageMessage(t("error.representative.missing"), "error");
+      focusField(caseRepresentativeProfileField);
+    }
+    return;
+  }
+
   var guidance = renderGuidance();
   var id = formData.id || await api.getNextId();
 
@@ -824,7 +1155,7 @@ async function performSave(options) {
 
   try {
     var saved = await api.saveCase(caseData);
-    casesState = await api.getCases();
+    casesState = hydrateCases(await api.getCases());
     renderCaseTable();
     populateCaseForm(saved);
     if (silent) {
@@ -914,12 +1245,18 @@ document.getElementById("lang-fr").addEventListener("click", function() { setLan
 
 async function initialize() {
   applyRuntimeMode();
+  renderRepresentativeSelectors("", "");
+  populateRepresentativeDirectoryForm(null);
+  setRepresentativeFieldsLocked(false);
+  updateRepresentativeModeHint(null);
 
   if (supportsCaseStorage) {
     try {
-      casesState = await api.getCases();
+      await refreshRepresentatives("", "");
+      casesState = hydrateCases(await api.getCases());
     } catch (err) {
       setStorageMessage("Error al cargar los casos: " + err.message, "error");
+      representativesState = [];
       casesState = [];
     }
   }

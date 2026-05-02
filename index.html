@@ -86,6 +86,14 @@
           </label>
 
           <label class="field">
+            <span data-i18n="field.representativeProfile">Representante guardado</span>
+            <select id="case-representative-profile">
+              <option value="" data-i18n="field.representativeProfile.empty">Sin enlace guardado / datos manuales</option>
+            </select>
+            <span class="field-hint" data-i18n="field.representativeProfile.hint">Selecciona una ficha guardada. Si prefieres un contacto puntual, deja este selector vacio y escribe abajo.</span>
+          </label>
+
+          <label class="field">
             <span data-i18n="field.representativeName">Representante</span>
             <input id="case-representative-name" type="text" data-i18n-placeholder="field.representativeName.placeholder" placeholder="Nombre de la persona o entidad representante">
           </label>
@@ -98,6 +106,7 @@
           <label class="field">
             <span data-i18n="field.representativeEmail">Email representante</span>
             <input id="case-representative-email" type="email" data-i18n-placeholder="field.representativeEmail.placeholder" placeholder="representante@ejemplo.org" autocomplete="off">
+            <span class="field-hint" id="case-representative-mode-hint" data-i18n="field.representativeData.hint.manual">Sin ficha enlazada: puedes escribir un contacto puntual solo para este caso.</span>
           </label>
 
           <label class="field">
@@ -108,6 +117,40 @@
             </select>
             <span class="field-hint" data-i18n="field.notificationTarget.hint">Si el caso lo lleva una persona representante, las notificaciones posteriores suelen llegarle a ella de forma preferente.</span>
           </label>
+
+          <details id="representative-directory-panel" class="subpanel representative-directory-panel">
+            <summary data-i18n="representatives.directory.legend">Agenda de representantes</summary>
+            <p class="note" data-i18n="representatives.directory.note">Guarda aqui las fichas reutilizables. Luego el caso solo tiene que enlazar una de ellas.</p>
+
+            <label class="field">
+              <span data-i18n="representatives.directory.select">Ficha de la agenda</span>
+              <select id="representative-directory-select">
+                <option value="" data-i18n="representatives.directory.select.empty">Nueva ficha</option>
+              </select>
+            </label>
+
+            <div class="field-grid two-columns">
+              <label class="field">
+                <span data-i18n="field.representativeName">Representante</span>
+                <input id="representative-directory-name" type="text" data-i18n-placeholder="field.representativeName.placeholder" placeholder="Nombre de la persona o entidad representante">
+              </label>
+
+              <label class="field">
+                <span data-i18n="field.representativePhone">Telefono representante</span>
+                <input id="representative-directory-phone" type="tel" data-i18n-placeholder="field.representativePhone.placeholder" placeholder="600123123" autocomplete="off">
+              </label>
+            </div>
+
+            <label class="field">
+              <span data-i18n="field.representativeEmail">Email representante</span>
+              <input id="representative-directory-email" type="email" data-i18n-placeholder="field.representativeEmail.placeholder" placeholder="representante@ejemplo.org" autocomplete="off">
+            </label>
+
+            <div class="actions representative-directory-actions">
+              <button type="button" id="new-representative-button" class="secondary" data-i18n="btn.newRepresentative">Nueva ficha</button>
+              <button type="button" id="save-representative-button" data-i18n="btn.saveRepresentative">Guardar ficha</button>
+            </div>
+          </details>
 
           <label class="field">
             <span data-i18n="field.nextDate">Fecha del siguiente paso</span>
@@ -314,6 +357,66 @@
           <textarea id="case-notes" rows="4" data-i18n-placeholder="field.notes.placeholder" placeholder="Observaciones, bloqueos o detalles de seguimiento"></textarea>
         </label>
 
+        <fieldset>
+          <legend data-i18n="presentation.legend">Preparacion de presentacion</legend>
+          <p class="note" data-i18n="presentation.note">Usa este bloque para dejar claro si el caso puede presentarse por entidad colaboradora y que falta antes de entrar en Mercurio.</p>
+
+          <div class="field-grid two-columns">
+            <label class="field">
+              <span data-i18n="field.presentationByCollaborator">Puede presentar entidad colaboradora</span>
+              <select id="case-presentation-by-collaborator">
+                <option value="" data-i18n="prep.choice.review">Por revisar</option>
+                <option value="yes" data-i18n="prep.choice.yes">Si</option>
+                <option value="no" data-i18n="prep.choice.no">No</option>
+              </select>
+              <span class="field-hint" data-i18n="field.presentationByCollaborator.hint">Marca si una entidad colaboradora con certificado puede asumir la presentacion de este expediente.</span>
+            </label>
+
+            <label class="field">
+              <span data-i18n="field.presentationPresenter">Persona que presentara</span>
+              <input id="case-presentation-presenter" type="text" data-i18n-placeholder="field.presentationPresenter.placeholder" placeholder="Nombre de quien presentara el expediente">
+            </label>
+
+            <label class="field">
+              <span data-i18n="field.presentationAuthorizationSigned">Autorizacion firmada</span>
+              <select id="case-presentation-authorization-signed">
+                <option value="" data-i18n="prep.choice.review">Por revisar</option>
+                <option value="yes" data-i18n="prep.choice.yes">Si</option>
+                <option value="no" data-i18n="prep.choice.no">No</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="field.presentationDocumentsReady">Documentacion completa</span>
+              <select id="case-presentation-documents-ready">
+                <option value="" data-i18n="prep.choice.review">Por revisar</option>
+                <option value="yes" data-i18n="prep.choice.yes">Si</option>
+                <option value="no" data-i18n="prep.choice.no">No</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="field.presentationMercurioReady">Lista para Mercurio</span>
+              <select id="case-presentation-mercurio-ready">
+                <option value="" data-i18n="prep.choice.review">Por revisar</option>
+                <option value="yes" data-i18n="prep.choice.yes">Si</option>
+                <option value="no" data-i18n="prep.choice.no">No</option>
+              </select>
+              <span class="field-hint" data-i18n="field.presentationMercurioReady.hint">Marca si ya se puede entrar a Mercurio y presentar sin rehacer el expediente.</span>
+            </label>
+
+            <label class="field">
+              <span data-i18n="field.presentationDate">Fecha de presentacion</span>
+              <input id="case-presentation-date" type="date">
+            </label>
+
+            <label class="field">
+              <span data-i18n="field.presentationRegistryNumber">Numero de registro</span>
+              <input id="case-presentation-registry-number" type="text" data-i18n-placeholder="field.presentationRegistryNumber.placeholder" placeholder="Resguardo o numero de registro">
+            </label>
+          </div>
+        </fieldset>
+
         <div class="actions">
           <button id="save-case-button" type="submit" data-i18n="btn.save">Guardar caso</button>
           <button type="button" id="clear-case-button" class="secondary" data-i18n="btn.clear">Limpiar ficha</button>
@@ -370,6 +473,7 @@
               <th data-i18n="table.person">Persona</th>
               <th data-i18n="table.route">Ruta</th>
               <th data-i18n="table.status">Estado</th>
+              <th data-i18n="table.presentation">Presentacion</th>
               <th data-i18n="table.nextDate">Proxima cita</th>
               <th data-i18n="table.nextStep">Proximo paso</th>
               <th data-i18n="table.volunteer">Voluntariado</th>

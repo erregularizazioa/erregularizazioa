@@ -372,6 +372,34 @@ label > span {
   font-size: 1rem;
 }
 
+.representative-directory-panel {
+  margin-top: 4px;
+}
+
+.representative-directory-panel summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  list-style: none;
+}
+
+.representative-directory-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.representative-directory-panel[open] {
+  display: grid;
+  gap: 16px;
+}
+
+.representative-directory-actions {
+  justify-content: flex-start;
+}
+
+input.is-linked {
+  background: #f8fafc;
+}
+
 .choice {
   display: flex;
   gap: 14px;
@@ -835,6 +863,7 @@ td .table-action {
   .landing-simple-step {
     grid-template-columns: 1fr;
   }
+
 }
 
 @media print {
@@ -916,6 +945,20 @@ details.step-help p {
 .route-family    { background: #d1e7dd; color: #0a3622; }
 .route-pending   { background: #f8d7da; color: #842029; }
 .route-other     { background: #e2e3e5; color: #41464b; }
+
+.prep-badge-pill {
+  display: inline-block;
+  font-size: 0.8em;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.prep-review         { background: #e5e7eb; color: #374151; }
+.prep-ready          { background: var(--ok-bg); color: var(--ok); }
+.prep-submitted      { background: var(--accent-soft); color: var(--accent); }
+.prep-no-collaborator { background: var(--warn-bg); color: var(--warn); }
 
 /* Overdue rows and date */
 tr.row-overdue {

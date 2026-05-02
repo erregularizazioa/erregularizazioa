@@ -4,6 +4,8 @@ Herramienta de escritorio para voluntarios/as que acompañan casos de la **regul
 
 Cada ficha reune en un solo sitio: datos del caso, analisis de elegibilidad paso a paso, lista de documentacion, pasos del proceso y seguimiento. Los datos se guardan en una base de datos SQLite local. El Excel se exporta con un clic y ahora tambien hay **copia/restauracion de la base local**.
 
+Tambien hay una **agenda reutilizable de representantes**: puedes guardar o actualizar una ficha en la agenda y despues enlazarla desde cada caso, sin mezclar la gestion centralizada con la ficha concreta del expediente.
+
 ---
 
 ## Arrancar en desarrollo
@@ -73,12 +75,27 @@ https://joanesplazaola.github.io/erregularizazioa/simulador.html
 
 ### Configuracion de Supabase para el area privada
 
-1. En Supabase, ejecuta `supabase/schema.sql` en el SQL editor.
-2. En **Authentication → Providers → Email**, deja activo **Email + password**.
-3. En **Authentication → Users**, crea manualmente las 2-3 personas del equipo y define su contraseña.
-4. Los datos del cliente web viven en `pages/config.js`.
+1. Aplica el esquema desde este repo:
 
-Con la configuracion actual, solo las personas autenticadas pueden leer y escribir casos en la tabla compartida.
+```bash
+SUPABASE_DB_PASSWORD="[PASSWORD]" npm run supabase:apply
+```
+
+Tambien puedes usar una conexion completa:
+
+```bash
+SUPABASE_DB_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres" npm run supabase:apply
+```
+
+El script toma el `project-ref` desde `pages/config.js`, asi que normalmente basta con la contrasena de la base.
+Si la conexion directa por `db.<project-ref>.supabase.co` falla por IPv6, el comando intenta automaticamente el **pooler IPv4** de Supabase.
+
+2. Si prefieres hacerlo manualmente, `supabase/schema.sql` sigue siendo la fuente de verdad.
+3. En **Authentication → Providers → Email**, deja activo **Email + password**.
+4. En **Authentication → Users**, crea manualmente las 2-3 personas del equipo y define su contraseña.
+5. Los datos del cliente web viven en `pages/config.js`.
+
+Con la configuracion actual, solo las personas autenticadas pueden leer y escribir casos y fichas de representante en las tablas compartidas.
 
 ---
 
@@ -88,13 +105,13 @@ Con la configuracion actual, solo las personas autenticadas pueden leer y escrib
 |---|---|
 | `main.js` | Proceso principal de Electron: ventana, IPC, arranque de la BD |
 | `preload.js` | Puente seguro entre el proceso principal y la UI |
-| `db.js` | Capa SQLite (`sql.js`): CRUD de casos, generacion de IDs, exportacion a Excel |
+| `db.js` | Capa SQLite (`sql.js`): CRUD de casos y representantes, generacion de IDs, exportacion a Excel |
 | `index.html` | Interfaz completa: ficha unica, wizard de analisis, tabla de casos |
 | `styles.css` | Diseño visual |
 | `logic.js` | Logica pura de elegibilidad y generacion de checklists (sin dependencias, testeable en Node) |
 | `app.js` | Controlador de la UI: conecta la logica con el DOM y la API de Electron |
 | `pages/public-index.html` | Landing publica para GitHub Pages |
-| `pages/supabase-web.js` | Capa web privada: login con Supabase y CRUD compartido |
+| `pages/supabase-web.js` | Capa web privada: login con Supabase y CRUD compartido de casos y representantes |
 | `pages/config.js` | URL y clave publica del proyecto Supabase |
 | `.github/workflows/deploy-pages.yml` | Workflow que construye `dist/pages/` y lo despliega en GitHub Pages |
 | `scripts/build-pages.js` | Copia la UI compartida a `dist/pages/` para publicar una version estatica |

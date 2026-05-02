@@ -74,8 +74,16 @@ ipcMain.handle("getCases", () => {
   return db.getAllCases();
 });
 
+ipcMain.handle("getRepresentatives", () => {
+  return db.getAllRepresentatives();
+});
+
 ipcMain.handle("getNextId", () => {
   return db.getNextId();
+});
+
+ipcMain.handle("saveRepresentative", (_event, representativeData) => {
+  return db.saveRepresentative(representativeData);
 });
 
 ipcMain.handle("saveCase", (_event, caseData) => {

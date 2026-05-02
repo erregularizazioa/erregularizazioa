@@ -56,14 +56,31 @@ async function buildDOM(options = {}) {
   };
 
   if (options.withElectronAPI !== false) {
+    const cases = (options.cases || []).map((item) => ({ ...item }));
+    const representatives = (options.representatives || []).map((item) => ({ ...item }));
+
     // Stub electronAPI (no real Electron in tests)
     window.electronAPI = {
-      getCases:    async () => options.cases || [],
-      saveCase:    async (c) => ({ ...c, id: c.id || "REG-2026-00001" }),
+      getCases:    async () => cases.map((item) => ({ ...item })),
+      getRepresentatives: async () => representatives.map((item) => ({ ...item })),
+      saveRepresentative: async (representative) => {
+        const saved = { ...representative, id: representative.id || "REP-00001" };
+        const index = representatives.findIndex((item) => item.id === saved.id);
+        if (index >= 0) representatives[index] = saved;
+        else representatives.push(saved);
+        return saved;
+      },
+      saveCase:    async (c) => {
+        const saved = { ...c, id: c.id || "REG-2026-00001" };
+        const index = cases.findIndex((item) => item.id === saved.id);
+        if (index >= 0) cases[index] = saved;
+        else cases.push(saved);
+        return saved;
+      },
       getNextId:   async () => "REG-2026-00001",
       exportExcel: async () => ({ ok: true }),
       backupDatabase: async () => ({ ok: true, path: "/tmp/regularizazioa-backup.db" }),
-      restoreDatabase: async () => ({ ok: true, path: "/tmp/regularizazioa-backup.db", cases: options.cases || [] })
+      restoreDatabase: async () => ({ ok: true, path: "/tmp/regularizazioa-backup.db", cases })
     };
   }
 
@@ -144,7 +161,14 @@ test("save still works when representative fields are missing from the HTML", as
         "case-representative-name",
         "case-representative-phone",
         "case-representative-email",
-        "case-notification-target"
+        "case-notification-target",
+        "case-presentation-by-collaborator",
+        "case-presentation-presenter",
+        "case-presentation-authorization-signed",
+        "case-presentation-documents-ready",
+        "case-presentation-mercurio-ready",
+        "case-presentation-date",
+        "case-presentation-registry-number"
       ].forEach(function(id) {
         var el = doc.getElementById(id);
         if (el && el.parentNode) el.parentNode.remove();
@@ -161,6 +185,89 @@ test("save still works when representative fields are missing from the HTML", as
   await new Promise((r) => setTimeout(r, 100));
 
   assert.match(document.getElementById("case-id-preview").textContent, /REG-2026/);
+});
+
+test("form keeps presentation prep fields after save", async () => {
+  const { window, document, appLoadError } = await buildDOM();
+
+  if (appLoadError) {
+    throw new Error("Skipped because app.js failed to load: " + appLoadError.message);
+  }
+
+  document.getElementById("case-name").value = "Caso Mercurio";
+  document.getElementById("case-presentation-by-collaborator").value = "yes";
+  document.getElementById("case-presentation-presenter").value = "Compa certificada";
+  document.getElementById("case-presentation-authorization-signed").value = "yes";
+  document.getElementById("case-presentation-documents-ready").value = "yes";
+  document.getElementById("case-presentation-mercurio-ready").value = "yes";
+  document.getElementById("case-presentation-registry-number").value = "REGISTRO-123";
+
+  document.getElementById("case-form").dispatchEvent(new window.Event("submit", { bubbles: true, cancelable: true }));
+  await new Promise((r) => setTimeout(r, 100));
+
+  assert.equal(document.getElementById("case-presentation-by-collaborator").value, "yes");
+  assert.equal(document.getElementById("case-presentation-presenter").value, "Compa certificada");
+  assert.equal(document.getElementById("case-presentation-mercurio-ready").value, "yes");
+  assert.equal(document.getElementById("case-presentation-registry-number").value, "REGISTRO-123");
+});
+
+test("representative profiles can be saved and reused from the form", async () => {
+  const { window, document, appLoadError } = await buildDOM();
+
+  if (appLoadError) {
+    throw new Error("Skipped because app.js failed to load: " + appLoadError.message);
+  }
+
+  document.getElementById("representative-directory-name").value = "Entidad amiga";
+  document.getElementById("representative-directory-phone").value = "600111222";
+  document.getElementById("representative-directory-email").value = "entidad@ejemplo.org";
+  document.getElementById("save-representative-button").click();
+  await new Promise((r) => setTimeout(r, 100));
+
+  assert.equal(document.getElementById("representative-directory-select").value, "REP-00001");
+  assert.match(document.getElementById("storage-message").textContent, /Entidad amiga/);
+
+  document.getElementById("clear-case-button").click();
+  document.getElementById("case-representative-profile").value = "REP-00001";
+  document.getElementById("case-representative-profile").dispatchEvent(new window.Event("change", { bubbles: true }));
+
+  assert.equal(document.getElementById("case-representative-name").value, "Entidad amiga");
+  assert.equal(document.getElementById("case-representative-phone").value, "600111222");
+  assert.equal(document.getElementById("case-representative-email").value, "entidad@ejemplo.org");
+  assert.equal(document.getElementById("case-representative-name").readOnly, true);
+});
+
+test("linked representative data is refreshed when loading a saved case", async () => {
+  const { document, appLoadError } = await buildDOM({
+    representatives: [{
+      id: "REP-00009",
+      name: "Entidad central",
+      phone: "699000111",
+      email: "central@ejemplo.org"
+    }],
+    cases: [{
+      id: "REG-2026-00009",
+      caseName: "Caso enlazado",
+      representativeId: "REP-00009",
+      representativeName: "Entidad antigua",
+      representativePhone: "600000000",
+      representativeEmail: "antigua@ejemplo.org",
+      answers: {},
+      checks: {}
+    }]
+  });
+
+  if (appLoadError) {
+    throw new Error("Skipped because app.js failed to load: " + appLoadError.message);
+  }
+
+  document.querySelector('[data-case-id="REG-2026-00009"]').click();
+  await new Promise((r) => setTimeout(r, 50));
+
+  assert.equal(document.getElementById("case-representative-profile").value, "REP-00009");
+  assert.equal(document.getElementById("case-representative-name").value, "Entidad central");
+  assert.equal(document.getElementById("case-representative-phone").value, "699000111");
+  assert.equal(document.getElementById("case-representative-email").readOnly, true);
 });
 
 test("form submit with only a name saves the case and shows the ID", async () => {
@@ -529,7 +636,7 @@ test("wizard stops early on the presence hard gate", async () => {
 
   const activeBefore = document.querySelector(".analysis-step.active");
   assert.equal(activeBefore.dataset.step, "2");
-  assert.match(document.getElementById("step-next").textContent, /Ver diagnostico/i);
+  assert.match(document.getElementById("step-next").textContent, /Ver diagn[oó]stico/i);
 
   document.getElementById("step-next").click();
   await new Promise((r) => setTimeout(r, 20));
@@ -644,7 +751,7 @@ test("copy summary copies a compact follow-up text to clipboard", async () => {
 
   assert.match(window.__copiedText, /REG-2026-00001/, "Copied summary should include the case ID");
   assert.match(window.__copiedText, /Persona Seguimiento/, "Copied summary should include the name");
-  assert.match(window.__copiedText, /Proximo paso recomendado:/, "Copied summary should include next-step label");
+  assert.match(window.__copiedText, /Pr[oó]ximo paso recomendado:/, "Copied summary should include next-step label");
   assert.match(window.__copiedText, /Representante: SOS Racismo/, "Copied summary should include representative");
   assert.match(window.__copiedText, /notificaciones.*Representante/i, "Copied summary should include notification target");
   assert.match(window.__copiedText, /Persona voluntaria: Ane/, "Copied summary should include volunteer");

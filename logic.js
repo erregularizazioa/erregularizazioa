@@ -39,6 +39,17 @@
     { key: "email", label: "Email" },
     { key: "locality", label: "Municipio o provincia" },
     { key: "volunteer", label: "Persona voluntaria" },
+    { key: "representativeName", label: "Representante" },
+    { key: "representativePhone", label: "Telefono representante" },
+    { key: "representativeEmail", label: "Email representante" },
+    { key: "notificationTarget", label: "Notificaciones" },
+    { key: "presentationByCollaborator", label: "Entidad colaboradora" },
+    { key: "presentationPresenter", label: "Presentara" },
+    { key: "presentationAuthorizationSigned", label: "Autorizacion firmada" },
+    { key: "presentationDocumentsReady", label: "Documentacion completa" },
+    { key: "presentationMercurioReady", label: "Lista para Mercurio" },
+    { key: "presentationDate", label: "Fecha de presentacion" },
+    { key: "presentationRegistryNumber", label: "Numero de registro" },
     { key: "route", label: "Ruta orientativa" },
     { key: "resultTitle", label: "Diagnostico" },
     { key: "caseStatus", label: "Estado del caso" },
@@ -79,6 +90,16 @@
     return nextChecks;
   }
 
+  function normalizeRepresentative(rawRepresentative) {
+    return {
+      id: String(rawRepresentative?.id || "").trim(),
+      name: String(rawRepresentative?.name || rawRepresentative?.representativeName || "").trim(),
+      phone: String(rawRepresentative?.phone || rawRepresentative?.representativePhone || "").trim(),
+      email: String(rawRepresentative?.email || rawRepresentative?.representativeEmail || "").trim(),
+      updatedAt: String(rawRepresentative?.updatedAt || "").trim()
+    };
+  }
+
   function normalizeCase(rawCase) {
     return {
       id: String(rawCase?.id || "").trim(),
@@ -87,6 +108,18 @@
       email: String(rawCase?.email || "").trim(),
       locality: String(rawCase?.locality || "").trim(),
       volunteer: String(rawCase?.volunteer || "").trim(),
+      representativeName: String(rawCase?.representativeName || "").trim(),
+      representativePhone: String(rawCase?.representativePhone || "").trim(),
+      representativeEmail: String(rawCase?.representativeEmail || "").trim(),
+      representativeId: String(rawCase?.representativeId || "").trim(),
+      notificationTarget: String(rawCase?.notificationTarget || "persona").trim(),
+      presentationByCollaborator: String(rawCase?.presentationByCollaborator || "").trim(),
+      presentationPresenter: String(rawCase?.presentationPresenter || "").trim(),
+      presentationAuthorizationSigned: String(rawCase?.presentationAuthorizationSigned || "").trim(),
+      presentationDocumentsReady: String(rawCase?.presentationDocumentsReady || "").trim(),
+      presentationMercurioReady: String(rawCase?.presentationMercurioReady || "").trim(),
+      presentationDate: String(rawCase?.presentationDate || "").trim(),
+      presentationRegistryNumber: String(rawCase?.presentationRegistryNumber || "").trim(),
       route: String(rawCase?.route || "").trim(),
       resultTitle: String(rawCase?.resultTitle || "").trim(),
       resultSummary: String(rawCase?.resultSummary || "").trim(),
@@ -675,6 +708,7 @@
     CSV_HEADERS,
     normalizeAnswers,
     normalizeChecks,
+    normalizeRepresentative,
     normalizeCase,
     evaluateAnswers,
     buildCaseGuidance,

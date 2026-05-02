@@ -3,7 +3,7 @@ const fs = require("fs");
 const initSqlJs = require("sql.js");
 const ExcelJS = require("exceljs");
 
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 4;
 
 let db;
 let dbFilePath;
@@ -16,6 +16,17 @@ const EXCEL_COLUMNS = [
   { header: "Email",                    key: "email",                    width: 30 },
   { header: "Municipio",                key: "locality",                 width: 15 },
   { header: "Voluntariado",             key: "volunteer",                width: 20 },
+  { header: "Representante",            key: "representativeName",       width: 25 },
+  { header: "Telefono representante",   key: "representativePhone",      width: 18 },
+  { header: "Email representante",      key: "representativeEmail",      width: 30 },
+  { header: "Notificaciones",           key: "notificationTarget",       width: 22 },
+  { header: "Entidad colaboradora",     key: "presentationByCollaborator", width: 22 },
+  { header: "Presentara",               key: "presentationPresenter",    width: 24 },
+  { header: "Autorizacion firmada",     key: "presentationAuthorizationSigned", width: 22 },
+  { header: "Documentacion completa",   key: "presentationDocumentsReady", width: 22 },
+  { header: "Lista para Mercurio",      key: "presentationMercurioReady", width: 20 },
+  { header: "Fecha de presentacion",    key: "presentationDate",         width: 18 },
+  { header: "Numero de registro",       key: "presentationRegistryNumber", width: 26 },
   { header: "Ruta orientativa",         key: "route",                    width: 35 },
   { header: "Diagnostico",             key: "resultTitle",              width: 50 },
   { header: "Estado del caso",          key: "caseStatus",               width: 22 },
@@ -84,6 +95,18 @@ async function initialize(dataDir) {
       email TEXT DEFAULT '',
       locality TEXT DEFAULT '',
       volunteer TEXT DEFAULT '',
+      representative_id TEXT DEFAULT '',
+      representative_name TEXT DEFAULT '',
+      representative_phone TEXT DEFAULT '',
+      representative_email TEXT DEFAULT '',
+      notification_target TEXT DEFAULT 'persona',
+      presentation_by_collaborator TEXT DEFAULT '',
+      presentation_presenter TEXT DEFAULT '',
+      presentation_authorization_signed TEXT DEFAULT '',
+      presentation_documents_ready TEXT DEFAULT '',
+      presentation_mercurio_ready TEXT DEFAULT '',
+      presentation_date TEXT DEFAULT '',
+      presentation_registry_number TEXT DEFAULT '',
       route TEXT DEFAULT '',
       result_title TEXT DEFAULT '',
       result_summary TEXT DEFAULT '',
@@ -99,12 +122,21 @@ async function initialize(dataDir) {
       updated_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS representatives (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT '',
+      phone TEXT DEFAULT '',
+      email TEXT DEFAULT '',
+      updated_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS meta (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
 
     INSERT OR IGNORE INTO meta (key, value) VALUES ('case_counter', '0');
+    INSERT OR IGNORE INTO meta (key, value) VALUES ('representative_counter', '0');
     INSERT OR IGNORE INTO meta (key, value) VALUES ('schema_version', '${SCHEMA_VERSION}');
   `);
 
@@ -114,15 +146,48 @@ async function initialize(dataDir) {
 
 function migrateSchema() {
   const row = queryOne("SELECT value FROM meta WHERE key = ?", ["schema_version"]);
-  const currentVersion = row ? Number(row.value) : 0;
+  let currentVersion = row ? Number(row.value) : 0;
+  let changed = !row;
 
-  if (currentVersion < 1) {
-    db.run("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", ["schema_version", String(SCHEMA_VERSION)]);
-    return;
+  if (currentVersion < 2) {
+    db.run("ALTER TABLE cases ADD COLUMN representative_name TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN representative_phone TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN representative_email TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN notification_target TEXT DEFAULT 'persona'");
+    currentVersion = 2;
+    changed = true;
   }
 
-  if (currentVersion !== SCHEMA_VERSION) {
-    db.run("UPDATE meta SET value = ? WHERE key = ?", [String(SCHEMA_VERSION), "schema_version"]);
+  if (currentVersion < 3) {
+    db.run("ALTER TABLE cases ADD COLUMN presentation_by_collaborator TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN presentation_presenter TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN presentation_authorization_signed TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN presentation_documents_ready TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN presentation_mercurio_ready TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN presentation_date TEXT DEFAULT ''");
+    db.run("ALTER TABLE cases ADD COLUMN presentation_registry_number TEXT DEFAULT ''");
+    currentVersion = 3;
+    changed = true;
+  }
+
+  if (currentVersion < 4) {
+    db.run("ALTER TABLE cases ADD COLUMN representative_id TEXT DEFAULT ''");
+    db.run(`
+      CREATE TABLE IF NOT EXISTS representatives (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL DEFAULT '',
+        phone TEXT DEFAULT '',
+        email TEXT DEFAULT '',
+        updated_at TEXT NOT NULL
+      )
+    `);
+    db.run("INSERT OR IGNORE INTO meta (key, value) VALUES ('representative_counter', '0')");
+    currentVersion = 4;
+    changed = true;
+  }
+
+  if (changed || currentVersion !== SCHEMA_VERSION) {
+    db.run("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", ["schema_version", String(SCHEMA_VERSION)]);
   }
 }
 
@@ -187,6 +252,18 @@ function rowToCase(row) {
     email:                   row.email,
     locality:                row.locality,
     volunteer:               row.volunteer,
+    representativeId:        row.representative_id,
+    representativeName:      row.representative_name,
+    representativePhone:     row.representative_phone,
+    representativeEmail:     row.representative_email,
+    notificationTarget:      row.notification_target,
+    presentationByCollaborator: row.presentation_by_collaborator,
+    presentationPresenter:   row.presentation_presenter,
+    presentationAuthorizationSigned: row.presentation_authorization_signed,
+    presentationDocumentsReady: row.presentation_documents_ready,
+    presentationMercurioReady: row.presentation_mercurio_ready,
+    presentationDate:        row.presentation_date,
+    presentationRegistryNumber: row.presentation_registry_number,
     route:                   row.route,
     resultTitle:             row.result_title,
     resultSummary:           row.result_summary,
@@ -207,6 +284,21 @@ function getAllCases() {
   return query("SELECT * FROM cases ORDER BY updated_at DESC, created_at DESC").map(rowToCase);
 }
 
+function rowToRepresentative(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    phone: row.phone,
+    email: row.email,
+    updatedAt: row.updated_at
+  };
+}
+
+function getAllRepresentatives() {
+  return query("SELECT * FROM representatives ORDER BY LOWER(name), updated_at DESC").map(rowToRepresentative);
+}
+
 function getNextId() {
   const row = queryOne("SELECT value FROM meta WHERE key = ?", ["case_counter"]);
   const next = Number(row.value) + 1;
@@ -215,23 +307,83 @@ function getNextId() {
   return "REG-2026-" + String(next).padStart(5, "0");
 }
 
+function getNextRepresentativeId() {
+  const row = queryOne("SELECT value FROM meta WHERE key = ?", ["representative_counter"]);
+  const next = Number(row && row.value || 0) + 1;
+  db.run("UPDATE meta SET value = ? WHERE key = ?", [String(next), "representative_counter"]);
+  return "REP-" + String(next).padStart(5, "0");
+}
+
+function saveRepresentative(representativeData) {
+  const now = new Date().toISOString();
+  const existingId = String(representativeData && representativeData.id || "").trim();
+  const name = String(representativeData && representativeData.name || "").trim();
+  const phone = String(representativeData && representativeData.phone || "").trim();
+  const email = String(representativeData && representativeData.email || "").trim();
+
+  if (!name) {
+    throw new Error("El representante necesita al menos un nombre.");
+  }
+
+  const id = existingId || getNextRepresentativeId();
+
+  db.run(`
+    INSERT INTO representatives (id, name, phone, email, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      name = excluded.name,
+      phone = excluded.phone,
+      email = excluded.email,
+      updated_at = excluded.updated_at
+  `, [id, name, phone, email, now]);
+
+  const match = /^REP-(\d+)$/.exec(id);
+  if (match) {
+    const num = Number(match[1]);
+    const counterRow = queryOne("SELECT value FROM meta WHERE key = ?", ["representative_counter"]);
+    if (num > Number(counterRow && counterRow.value || 0)) {
+      db.run("UPDATE meta SET value = ? WHERE key = ?", [String(num), "representative_counter"]);
+    }
+  }
+
+  flush();
+  return rowToRepresentative(queryOne("SELECT * FROM representatives WHERE id = ?", [id]));
+}
+
 function saveCase(caseData) {
   const now = new Date().toISOString();
   const existing = queryOne("SELECT id, created_at FROM cases WHERE id = ?", [caseData.id]);
 
   db.run(`
     INSERT INTO cases (
-      id, case_name, phone, email, locality, volunteer, route,
+      id, case_name, phone, email, locality, volunteer,
+      representative_id,
+      representative_name, representative_phone, representative_email, notification_target,
+      presentation_by_collaborator, presentation_presenter, presentation_authorization_signed,
+      presentation_documents_ready, presentation_mercurio_ready, presentation_date, presentation_registry_number,
+      route,
       result_title, result_summary, case_status, next_date, next_action,
       notes, documents_pending, steps_pending, answers, checks,
       created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(id) DO UPDATE SET
       case_name = excluded.case_name,
       phone = excluded.phone,
       email = excluded.email,
       locality = excluded.locality,
       volunteer = excluded.volunteer,
+      representative_id = excluded.representative_id,
+      representative_name = excluded.representative_name,
+      representative_phone = excluded.representative_phone,
+      representative_email = excluded.representative_email,
+      notification_target = excluded.notification_target,
+      presentation_by_collaborator = excluded.presentation_by_collaborator,
+      presentation_presenter = excluded.presentation_presenter,
+      presentation_authorization_signed = excluded.presentation_authorization_signed,
+      presentation_documents_ready = excluded.presentation_documents_ready,
+      presentation_mercurio_ready = excluded.presentation_mercurio_ready,
+      presentation_date = excluded.presentation_date,
+      presentation_registry_number = excluded.presentation_registry_number,
       route = excluded.route,
       result_title = excluded.result_title,
       result_summary = excluded.result_summary,
@@ -251,6 +403,18 @@ function saveCase(caseData) {
     String(caseData.email || ""),
     String(caseData.locality || ""),
     String(caseData.volunteer || ""),
+    String(caseData.representativeId || ""),
+    String(caseData.representativeName || ""),
+    String(caseData.representativePhone || ""),
+    String(caseData.representativeEmail || ""),
+    String(caseData.notificationTarget || "persona"),
+    String(caseData.presentationByCollaborator || ""),
+    String(caseData.presentationPresenter || ""),
+    String(caseData.presentationAuthorizationSigned || ""),
+    String(caseData.presentationDocumentsReady || ""),
+    String(caseData.presentationMercurioReady || ""),
+    String(caseData.presentationDate || ""),
+    String(caseData.presentationRegistryNumber || ""),
     String(caseData.route || ""),
     String(caseData.resultTitle || ""),
     String(caseData.resultSummary || ""),
@@ -305,6 +469,17 @@ async function writeExcel(filePath, casesData) {
       email:                   c.email,
       locality:                c.locality,
       volunteer:               c.volunteer,
+      representativeName:      c.representativeName,
+      representativePhone:     c.representativePhone,
+      representativeEmail:     c.representativeEmail,
+      notificationTarget:      c.notificationTarget,
+      presentationByCollaborator: c.presentationByCollaborator,
+      presentationPresenter:   c.presentationPresenter,
+      presentationAuthorizationSigned: c.presentationAuthorizationSigned,
+      presentationDocumentsReady: c.presentationDocumentsReady,
+      presentationMercurioReady: c.presentationMercurioReady,
+      presentationDate:        c.presentationDate,
+      presentationRegistryNumber: c.presentationRegistryNumber,
       route:                   c.route,
       resultTitle:             c.resultTitle,
       caseStatus:              c.caseStatus,
@@ -356,7 +531,9 @@ module.exports = {
   SCHEMA_VERSION,
   initialize,
   getAllCases,
+  getAllRepresentatives,
   getNextId,
+  saveRepresentative,
   saveCase,
   writeExcel,
   writeBackup,
