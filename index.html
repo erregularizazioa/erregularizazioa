@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-i18n="page.title">Regularizazioa 2026</title>
+  <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="16" fill="%2316334b"/%3E%3Ccircle cx="32" cy="32" r="14" fill="%23e17321"/%3E%3C/svg%3E'>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -82,6 +83,30 @@
           <label class="field">
             <span data-i18n="field.volunteer">Persona voluntaria</span>
             <input id="case-volunteer" type="text" data-i18n-placeholder="field.volunteer.placeholder" placeholder="Nombre de quien hace seguimiento">
+          </label>
+
+          <label class="field">
+            <span data-i18n="field.representativeName">Representante</span>
+            <input id="case-representative-name" type="text" data-i18n-placeholder="field.representativeName.placeholder" placeholder="Nombre de la persona o entidad representante">
+          </label>
+
+          <label class="field">
+            <span data-i18n="field.representativePhone">Telefono representante</span>
+            <input id="case-representative-phone" type="tel" data-i18n-placeholder="field.representativePhone.placeholder" placeholder="600123123" autocomplete="off">
+          </label>
+
+          <label class="field">
+            <span data-i18n="field.representativeEmail">Email representante</span>
+            <input id="case-representative-email" type="email" data-i18n-placeholder="field.representativeEmail.placeholder" placeholder="representante@ejemplo.org" autocomplete="off">
+          </label>
+
+          <label class="field">
+            <span data-i18n="field.notificationTarget">A quien llegan preferentemente las notificaciones</span>
+            <select id="case-notification-target">
+              <option value="persona" data-i18n="notificationTarget.persona">Persona solicitante</option>
+              <option value="representante" data-i18n="notificationTarget.representante">Representante</option>
+            </select>
+            <span class="field-hint" data-i18n="field.notificationTarget.hint">Si el caso lo lleva una persona representante, las notificaciones posteriores suelen llegarle a ella de forma preferente.</span>
           </label>
 
           <label class="field">

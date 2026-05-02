@@ -36,9 +36,10 @@ No requiere instalacion. En Windows basta con ejecutar el `.exe` directamente.
 npm run build:pages
 ```
 
-Esto genera `dist/pages/` con dos entradas web:
+Esto genera `dist/pages/` con tres entradas web:
 
 - `index.html` → pagina publica
+- `simulador.html` → orientacion publica sin login ni guardado
 - `private.html` → area privada con login y casos centralizados en Supabase
 
 ### Publicacion automatica en GitHub Pages
@@ -62,6 +63,12 @@ El acceso privado quedara en:
 
 ```text
 https://joanesplazaola.github.io/erregularizazioa/private.html
+```
+
+La orientacion publica quedara en:
+
+```text
+https://joanesplazaola.github.io/erregularizazioa/simulador.html
 ```
 
 ### Configuracion de Supabase para el area privada

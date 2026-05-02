@@ -3,13 +3,15 @@ const path = require("path");
 
 const ROOT_DIR = path.resolve(__dirname, "..");
 const OUTPUT_DIR = path.join(ROOT_DIR, "dist", "pages");
-const SHARED_FILES_TO_COPY = [
+const SHARED_PATHS_TO_COPY = [
   "app.js",
   "logic.js",
   "translations.js",
   "styles.css",
   "pages/config.js",
-  "pages/supabase-web.js"
+  "pages/favicon.ico",
+  "pages/supabase-web.js",
+  "pages/assets"
 ];
 
 function injectPrivateShell(appHtml) {
@@ -18,10 +20,12 @@ function injectPrivateShell(appHtml) {
       '<main class="layout">',
       [
         '<section id="auth-shell" class="layout auth-layout">',
-        '  <section class="panel auth-panel">',
-        '    <p class="eyebrow">Regularizacion extraordinaria 2026</p>',
-        '    <h1>Area privada</h1>',
-        '    <p class="intro">Acceso restringido para el equipo invitado. Inicia sesion con tu correo y contrasena para abrir la base centralizada de casos.</p>',
+        '  <section class="panel auth-panel auth-panel-simple">',
+        '    <img class="auth-brand-logo" src="./assets/sindicato-socialista-vivienda.png" alt="Sindicato Socialista de Vivienda">',
+        '    <p class="eyebrow">Area privada del equipo</p>',
+        '    <h1>Entrar</h1>',
+        '    <p class="intro">Usa tu usuario autorizado para abrir los casos guardados y continuar el seguimiento.</p>',
+        '    <div class="notice info auth-notice" role="status">La portada publica explica la herramienta. Los casos reales solo se guardan aqui.</div>',
         '    <form id="login-form" class="auth-form">',
         '      <label class="field">',
         '        <span>Email autorizado</span>',
@@ -31,7 +35,7 @@ function injectPrivateShell(appHtml) {
         '        <span>Contrasena</span>',
         '        <input id="login-password" type="password" placeholder="Tu contrasena" autocomplete="current-password" required>',
         '      </label>',
-        '      <div class="actions">',
+        '      <div class="actions auth-actions">',
         '        <button type="submit">Entrar</button>',
         '        <a class="secondary-link" href="./">Volver a la pagina publica</a>',
         '      </div>',
@@ -73,12 +77,17 @@ async function main() {
   await fs.promises.rm(OUTPUT_DIR, { recursive: true, force: true });
   await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
 
-  await Promise.all(SHARED_FILES_TO_COPY.map(async function(fileName) {
-    const outputName = fileName.replace(/^pages\//, "");
-    await fs.promises.copyFile(
-      path.join(ROOT_DIR, fileName),
-      path.join(OUTPUT_DIR, outputName)
-    );
+  await Promise.all(SHARED_PATHS_TO_COPY.map(async function(entryPath) {
+    const sourcePath = path.join(ROOT_DIR, entryPath);
+    const outputPath = path.join(OUTPUT_DIR, entryPath.replace(/^pages\//, ""));
+    const sourceStats = await fs.promises.stat(sourcePath);
+
+    if (sourceStats.isDirectory()) {
+      await fs.promises.cp(sourcePath, outputPath, { recursive: true });
+      return;
+    }
+
+    await fs.promises.copyFile(sourcePath, outputPath);
   }));
 
   const appHtml = await fs.promises.readFile(path.join(ROOT_DIR, "index.html"), "utf8");
@@ -87,6 +96,7 @@ async function main() {
 
   await Promise.all([
     fs.promises.writeFile(path.join(OUTPUT_DIR, "index.html"), publicHtml),
+    fs.promises.writeFile(path.join(OUTPUT_DIR, "simulador.html"), appHtml),
     fs.promises.writeFile(path.join(OUTPUT_DIR, "private.html"), privateHtml)
   ]);
 
