@@ -41,6 +41,10 @@ async function buildDOM(options = {}) {
 
   const { window } = dom;
 
+  if (typeof options.mutateDocument === "function") {
+    options.mutateDocument(window.document);
+  }
+
   // jsdom doesn't implement layout APIs — stub them so focusField() doesn't throw
   window.HTMLElement.prototype.scrollIntoView = function() {};
 
@@ -131,6 +135,32 @@ test("static mode blocks save and keeps the page read-only", async () => {
     document.getElementById("storage-message").textContent.match(/solo de consulta|lecture seule/i),
     "Static mode should explain that saving is disabled"
   );
+});
+
+test("save still works when representative fields are missing from the HTML", async () => {
+  const { window, document, appLoadError } = await buildDOM({
+    mutateDocument: function(doc) {
+      [
+        "case-representative-name",
+        "case-representative-phone",
+        "case-representative-email",
+        "case-notification-target"
+      ].forEach(function(id) {
+        var el = doc.getElementById(id);
+        if (el && el.parentNode) el.parentNode.remove();
+      });
+    }
+  });
+
+  if (appLoadError) {
+    throw new Error("Skipped because app.js failed to load: " + appLoadError.message);
+  }
+
+  document.getElementById("case-name").value = "Caso cacheado";
+  document.getElementById("case-form").dispatchEvent(new window.Event("submit", { bubbles: true, cancelable: true }));
+  await new Promise((r) => setTimeout(r, 100));
+
+  assert.match(document.getElementById("case-id-preview").textContent, /REG-2026/);
 });
 
 test("form submit with only a name saves the case and shows the ID", async () => {
@@ -599,6 +629,8 @@ test("copy summary copies a compact follow-up text to clipboard", async () => {
 
   document.getElementById("case-name").value = "Persona Seguimiento";
   document.getElementById("case-volunteer").value = "Ane";
+  document.getElementById("case-representative-name").value = "SOS Racismo";
+  document.getElementById("case-notification-target").value = "representante";
   document.getElementById("case-next-date").value = "2026-05-03";
 
   document.getElementById("case-form").dispatchEvent(
@@ -613,6 +645,8 @@ test("copy summary copies a compact follow-up text to clipboard", async () => {
   assert.match(window.__copiedText, /REG-2026-00001/, "Copied summary should include the case ID");
   assert.match(window.__copiedText, /Persona Seguimiento/, "Copied summary should include the name");
   assert.match(window.__copiedText, /Proximo paso recomendado:/, "Copied summary should include next-step label");
+  assert.match(window.__copiedText, /Representante: SOS Racismo/, "Copied summary should include representative");
+  assert.match(window.__copiedText, /notificaciones.*Representante/i, "Copied summary should include notification target");
   assert.match(window.__copiedText, /Persona voluntaria: Ane/, "Copied summary should include volunteer");
 });
 

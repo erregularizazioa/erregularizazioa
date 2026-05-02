@@ -264,6 +264,16 @@ function normalizeComparablePhone(value) {
   return String(value || "").replace(/\D+/g, "");
 }
 
+function getFieldValue(field, fallback) {
+  if (!field) return fallback == null ? "" : fallback;
+  return typeof field.value === "string" ? field.value : (fallback == null ? "" : fallback);
+}
+
+function setFieldValue(field, value) {
+  if (!field) return;
+  field.value = value;
+}
+
 function findPotentialDuplicate(formData) {
   var currentId = String(formData.id || "").trim();
   var phone = normalizeComparablePhone(formData.phone);
@@ -369,10 +379,10 @@ function collectCaseFormData() {
     email:      caseEmailField.value.trim(),
     locality:   caseLocalityField.value.trim(),
     volunteer:  caseVolunteerField.value.trim(),
-    representativeName: caseRepresentativeNameField.value.trim(),
-    representativePhone: caseRepresentativePhoneField.value.trim(),
-    representativeEmail: caseRepresentativeEmailField.value.trim(),
-    notificationTarget: caseNotificationTargetField.value,
+    representativeName: getFieldValue(caseRepresentativeNameField).trim(),
+    representativePhone: getFieldValue(caseRepresentativePhoneField).trim(),
+    representativeEmail: getFieldValue(caseRepresentativeEmailField).trim(),
+    notificationTarget: getFieldValue(caseNotificationTargetField, "persona"),
     caseStatus: getRadioValue("caseStatus") || "Nuevo",
     nextDate:   caseNextDateField.value.trim(),
     nextAction: caseNextActionField.value.trim(),
@@ -593,10 +603,10 @@ function clearCaseForm() {
   caseIdPreview.textContent = "";
   caseIdPreview.classList.add("hidden");
   caseLocalityField.value   = "Bergara";
-  caseRepresentativeNameField.value = "";
-  caseRepresentativePhoneField.value = "";
-  caseRepresentativeEmailField.value = "";
-  caseNotificationTargetField.value = "persona";
+  setFieldValue(caseRepresentativeNameField, "");
+  setFieldValue(caseRepresentativePhoneField, "");
+  setFieldValue(caseRepresentativeEmailField, "");
+  setFieldValue(caseNotificationTargetField, "persona");
   setRadioValue("caseStatus", "Nuevo");
   document.getElementById("phone-error").classList.add("hidden");
   document.getElementById("email-error").classList.add("hidden");
@@ -619,10 +629,10 @@ function populateCaseForm(caseItem) {
   document.getElementById("email-error").classList.add("hidden");
   caseLocalityField.value     = c.locality || "Bergara";
   caseVolunteerField.value    = c.volunteer;
-  caseRepresentativeNameField.value  = c.representativeName || "";
-  caseRepresentativePhoneField.value = c.representativePhone || "";
-  caseRepresentativeEmailField.value = c.representativeEmail || "";
-  caseNotificationTargetField.value  = c.notificationTarget || "persona";
+  setFieldValue(caseRepresentativeNameField, c.representativeName || "");
+  setFieldValue(caseRepresentativePhoneField, c.representativePhone || "");
+  setFieldValue(caseRepresentativeEmailField, c.representativeEmail || "");
+  setFieldValue(caseNotificationTargetField, c.notificationTarget || "persona");
   setRadioValue("caseStatus", c.caseStatus || "Nuevo");
   caseNextDateField.value     = c.nextDate;
   caseNotesField.value        = c.notes;
