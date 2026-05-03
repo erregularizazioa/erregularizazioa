@@ -849,17 +849,17 @@ function renderCaseTable() {
   caseTableBody.innerHTML = filtered.map(function(c) {
     var overdue = isOverdue(c);
     return '<tr class="' + (overdue ? "row-overdue" : "") + '">' +
-      "<td>" + escapeHtml(c.id) + "</td>" +
-      "<td><strong>" + escapeHtml(c.caseName || "-") + "</strong><br>" +
+      '<td data-label="' + escapeHtml(t("table.id")) + '">' + escapeHtml(c.id) + "</td>" +
+      '<td data-label="' + escapeHtml(t("table.person")) + '"><strong>' + escapeHtml(c.caseName || "-") + "</strong><br>" +
         '<span class="note">' + escapeHtml(c.phone || c.email || "-") + "</span></td>" +
-      "<td>" + routeBadge(c.route || "-") + "</td>" +
-      "<td>" + escapeHtml(c.caseStatus || "-") + "</td>" +
-      "<td>" + renderPresentationCell(c) + "</td>" +
-      "<td>" + formatNextDate(c.nextDate, overdue) + "</td>" +
-      "<td>" + escapeHtml(truncate(c.nextAction, 60)) + "</td>" +
-      "<td>" + escapeHtml(c.volunteer || "-") + "</td>" +
-      "<td>" + escapeHtml(formatDate(c.updatedAt || c.createdAt)) + "</td>" +
-      '<td><button type="button" class="table-action secondary" data-case-id="' + escapeHtml(c.id) + '">' + escapeHtml(t("table.edit")) + "</button></td>" +
+      '<td data-label="' + escapeHtml(t("table.route")) + '">' + routeBadge(c.route || "-") + "</td>" +
+      '<td data-label="' + escapeHtml(t("table.status")) + '">' + escapeHtml(c.caseStatus || "-") + "</td>" +
+      '<td data-label="' + escapeHtml(t("table.presentation")) + '">' + renderPresentationCell(c) + "</td>" +
+      '<td data-label="' + escapeHtml(t("table.nextDate")) + '">' + formatNextDate(c.nextDate, overdue) + "</td>" +
+      '<td data-label="' + escapeHtml(t("table.nextStep")) + '">' + escapeHtml(truncate(c.nextAction, 60)) + "</td>" +
+      '<td data-label="' + escapeHtml(t("table.volunteer")) + '">' + escapeHtml(c.volunteer || "-") + "</td>" +
+      '<td data-label="' + escapeHtml(t("table.updated")) + '">' + escapeHtml(formatDate(c.updatedAt || c.createdAt)) + "</td>" +
+      '<td data-label="' + escapeHtml(t("table.edit")) + '"><button type="button" class="table-action secondary" data-case-id="' + escapeHtml(c.id) + '">' + escapeHtml(t("table.edit")) + "</button></td>" +
       "</tr>";
   }).join("");
 }
