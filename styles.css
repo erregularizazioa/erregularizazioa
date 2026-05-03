@@ -846,8 +846,36 @@ td .table-action {
 
 @media (max-width: 640px) {
   .layout {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding: 18px 12px 32px;
+  }
+
+  .auth-layout {
+    min-height: auto;
+    align-items: stretch;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .auth-brand-logo,
+  .brand-logo {
+    width: min(100%, 170px);
+    margin-bottom: 14px;
+  }
+
+  .hero {
+    margin-bottom: 16px;
+  }
+
+  .hero-top {
+    gap: 8px;
+  }
+
+  .intro {
+    font-size: 1rem;
+  }
+
+  #runtime-mode-message {
+    margin-top: 12px;
   }
 
   .landing-simple-hero,
@@ -860,10 +888,149 @@ td .table-action {
     width: 100%;
   }
 
-  .landing-simple-step {
-    grid-template-columns: 1fr;
+  .secondary-link,
+  .landing-link {
+    width: 100%;
+    min-width: 0;
+    min-height: 50px;
+    padding: 12px 16px;
   }
 
+  .landing-actions {
+    display: grid;
+    gap: 12px;
+  }
+
+  .landing-actions-large .landing-link {
+    min-height: 50px;
+    min-width: 0;
+    font-size: 1rem;
+  }
+
+  .landing-simple-card,
+  .landing-simple-step,
+  .landing-simple-link,
+  .subpanel {
+    padding: 16px;
+  }
+
+  .landing-simple-step {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .landing-step-number {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 0;
+  }
+
+  .private-userbar,
+  .status-bar,
+  fieldset {
+    padding: 12px 14px;
+  }
+
+  .form-grid,
+  .field-grid,
+  .guidance-grid,
+  .section-heading,
+  .toolbar,
+  .actions,
+  .auth-form {
+    gap: 12px;
+  }
+
+  .choice {
+    gap: 10px;
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="search"],
+  select,
+  textarea {
+    min-height: 50px;
+    padding: 12px 14px;
+  }
+
+  textarea {
+    min-height: 96px;
+  }
+
+  button,
+  .lang-btn {
+    min-height: 50px;
+    font-size: 1rem;
+  }
+
+  .status-pill span {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .layout {
+    padding: 14px 10px 24px;
+  }
+
+  .landing-simple-hero,
+  .landing-simple-section,
+  .panel {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .auth-brand-logo,
+  .brand-logo {
+    width: min(100%, 148px);
+  }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+  }
+
+  .intro {
+    font-size: 0.96rem;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
+
+  h2 {
+    font-size: 1.28rem;
+  }
+
+  .lang-btn {
+    padding: 8px 12px;
+    border-radius: 16px;
+  }
+
+  .private-userbar,
+  .status-bar,
+  fieldset,
+  .landing-simple-card,
+  .landing-simple-step,
+  .landing-simple-link,
+  .subpanel {
+    padding: 12px;
+  }
+
+  .choice {
+    padding: 10px 12px;
+  }
+
+  .status-pill span {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 @media print {

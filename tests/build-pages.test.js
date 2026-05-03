@@ -19,7 +19,7 @@ test("build-pages generates public, simulator, and private web entries", () => {
   const configJs = fs.readFileSync(path.join(OUTPUT, "config.js"), "utf8");
   const logoPath = path.join(OUTPUT, "assets", "sindicato-socialista-vivienda.png");
 
-  assert.match(publicHtml, /Probar orientacion publica/);
+  assert.match(publicHtml, /Probar orientaci[oó]n p[uú]blica/);
   assert.match(publicHtml, /simulador\.html/);
   assert.match(publicHtml, /assets\/sindicato-socialista-vivienda\.png/);
   assert.match(simulatorHtml, /id="case-form"/);
