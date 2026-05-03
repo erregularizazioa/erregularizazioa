@@ -405,12 +405,29 @@ fieldset legend {
   display: block;
 }
 
-/* Analysis fieldset - clean, no borders */
+/* Analysis fieldset - subtle container */
 #analysis-fieldset {
-  border: none;
-  background: transparent;
-  padding: 0;
+  border: 1px solid var(--border);
+  background: #fffdfa;
+  border-radius: 16px;
+  padding: 20px;
   margin: 16px 0;
+}
+
+#analysis-fieldset legend {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0 8px;
+  margin-left: -8px;
+  margin-bottom: 0;
+  border: none;
+  background: var(--panel);
+  border-radius: 6px;
+  display: inline-block;
+  width: auto;
 }
 
 label,
@@ -1134,8 +1151,24 @@ td .table-action {
     margin-bottom: 10px;
   }
 
+  .subpanel {
+    padding: 0;
+  }
+
+  fieldset legend {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+
   #analysis-fieldset {
-    margin: 12px 0;
+    margin: 10px 0;
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  #analysis-fieldset legend {
+    font-size: 0.7rem;
+    padding: 2px 6px;
   }
 
   .form-grid,
@@ -1536,7 +1569,15 @@ td .table-action {
   }
 
   #analysis-fieldset {
-    margin: 8px 0;
+    margin: 12px 0;
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  #analysis-fieldset legend {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    margin-left: -6px;
   }
 
   .subpanel {
