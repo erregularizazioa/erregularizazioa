@@ -1,0 +1,100 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: Sindicato Socialista de Vivienda · Regularizacion 2026
+      - img "Sindicato Socialista de Vivienda" [ref=e6]
+      - heading "Orientacion publica y coordinacion privada para sostener cada caso" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Esta portada separa la explicacion abierta del trabajo interno. Sirve para contar como se usa la herramienta, compartir criterios comunes y abrir el espacio privado sin exponer datos personales ni fichas reales.
+      - generic [ref=e9]:
+        - link "Entrar al area privada" [ref=e10] [cursor=pointer]:
+          - /url: ./private.html
+        - link "Ver como funciona" [ref=e11] [cursor=pointer]:
+          - /url: "#como-funciona"
+      - list [ref=e12]:
+        - listitem [ref=e13]: Explicacion clara del proceso y del enfoque de trabajo.
+        - listitem [ref=e14]: Acceso restringido para guardar y editar casos reales.
+        - listitem [ref=e15]: Base centralizada pensada para un equipo pequeno y coordinado.
+    - complementary "Resumen de la herramienta" [ref=e16]:
+      - article [ref=e17]:
+        - paragraph [ref=e18]: Trabajo compartido
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - strong [ref=e21]: Diagnostico comun
+            - generic [ref=e22]: La misma lectura inicial para decidir la via y detectar bloqueos cuanto antes.
+          - generic [ref=e23]:
+            - strong [ref=e24]: Checklist util
+            - generic [ref=e25]: Documentacion, pasos y seguimiento reunidos en un solo flujo de trabajo.
+          - generic [ref=e26]:
+            - strong [ref=e27]: Equipo pequeno
+            - generic [ref=e28]: Una herramienta sencilla para dos o tres personas con acceso autorizado.
+      - article [ref=e29]:
+        - generic [ref=e30]: Equipo invitado
+        - heading "El area privada centraliza la informacion sin hacer publica ninguna ficha." [level=2] [ref=e31]
+        - paragraph [ref=e32]: Solo las personas autorizadas pueden entrar, guardar casos y actualizar el seguimiento compartido del equipo.
+  - generic [ref=e33]:
+    - generic [ref=e35]:
+      - paragraph [ref=e36]: Separacion clara
+      - heading "Una herramienta dividida en dos capas" [level=2] [ref=e37]
+      - paragraph [ref=e38]: La parte publica ordena el relato y la parte privada protege el trabajo interno con una frontera clara entre orientacion y gestion de datos.
+    - generic [ref=e39]:
+      - article [ref=e40]:
+        - generic [ref=e41]: Publico
+        - heading "Explicar y orientar" [level=3] [ref=e42]
+        - paragraph [ref=e43]: Una portada para presentar el proyecto, compartir recursos y mostrar la logica de la intervencion sin almacenar informacion personal.
+        - list [ref=e44]:
+          - listitem [ref=e45]: Relato comun sobre la regularizacion extraordinaria.
+          - listitem [ref=e46]: Presentacion ordenada de la herramienta y de sus criterios.
+          - listitem [ref=e47]: Enlaces de referencia para consulta y derivacion.
+      - article [ref=e48]:
+        - generic [ref=e49]: Privado
+        - heading "Guardar, coordinar y dar seguimiento" [level=3] [ref=e50]
+        - paragraph [ref=e51]: El equipo autorizado entra al area privada para registrar casos, actualizar tareas pendientes y trabajar sobre una base centralizada.
+        - list [ref=e52]:
+          - listitem [ref=e53]: Acceso por usuario y contrasena.
+          - listitem [ref=e54]: Casos centralizados en Supabase.
+          - listitem [ref=e55]: Seguimiento compartido para un equipo reducido.
+  - region "Tres necesidades en una sola herramienta" [ref=e56]:
+    - generic [ref=e57]:
+      - paragraph [ref=e58]: Que resuelve
+      - heading "Tres necesidades en una sola herramienta" [level=2] [ref=e59]
+    - generic [ref=e60]:
+      - article [ref=e61]:
+        - heading "Ordenar la acogida" [level=3] [ref=e62]
+        - paragraph [ref=e63]: La primera lectura del caso queda estructurada para que el equipo comparta los mismos criterios desde el primer contacto.
+      - article [ref=e64]:
+        - heading "Preparar la documentacion" [level=3] [ref=e65]
+        - paragraph [ref=e66]: La ficha agrupa pasos, comprobaciones y notas utiles para reunir pruebas y no perder informacion relevante.
+      - article [ref=e67]:
+        - heading "Sostener el seguimiento" [level=3] [ref=e68]
+        - paragraph [ref=e69]: "El trabajo no depende de una sola persona: cada caso queda visible y actualizable para el equipo invitado."
+  - generic [ref=e70]:
+    - generic [ref=e72]:
+      - paragraph [ref=e73]: Recorrido de trabajo
+      - heading "Como se usa en la practica" [level=2] [ref=e74]
+    - generic [ref=e75]:
+      - article [ref=e76]:
+        - generic [ref=e77]: "1"
+        - heading "Acogida" [level=3] [ref=e78]
+        - paragraph [ref=e79]: Se recoge la situacion general y se identifica la via mas probable.
+      - article [ref=e80]:
+        - generic [ref=e81]: "2"
+        - heading "Preparacion" [level=3] [ref=e82]
+        - paragraph [ref=e83]: Se ordenan documentos, bloqueos y tareas pendientes antes de presentar.
+      - article [ref=e84]:
+        - generic [ref=e85]: "3"
+        - heading "Seguimiento" [level=3] [ref=e86]
+        - paragraph [ref=e87]: El equipo comparte el estado del expediente y la proxima accion necesaria.
+  - generic [ref=e88]:
+    - generic [ref=e90]:
+      - paragraph [ref=e91]: Accesos y referencias
+      - heading "Enlaces utiles" [level=2] [ref=e92]
+    - list [ref=e93]:
+      - listitem [ref=e94]:
+        - link "Acceso privado del equipo" [ref=e95] [cursor=pointer]:
+          - /url: ./private.html
+      - listitem [ref=e96]:
+        - link "Portal oficial de regularizacion" [ref=e97] [cursor=pointer]:
+          - /url: https://www.inclusion.gob.es/regularizacion
+      - listitem [ref=e98]:
+        - link "Plataforma Mercurio" [ref=e99] [cursor=pointer]:
+          - /url: https://mercurio.delegaciondelgobierno.gob.es/mercurio/

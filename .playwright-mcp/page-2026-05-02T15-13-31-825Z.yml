@@ -1,0 +1,31 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img "Sindicato Socialista de Vivienda" [ref=e5]
+    - generic [ref=e6]:
+      - paragraph [ref=e7]: Base centralizada del equipo
+      - heading "Area privada de casos" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Acceso restringido para el equipo invitado. Inicia sesion con tu correo y contrasena para abrir la base compartida y continuar el seguimiento.
+  - generic [ref=e10]:
+    - article [ref=e11]:
+      - strong [ref=e12]: Centralizado
+      - generic [ref=e13]: Casos y seguimiento compartidos para el equipo autorizado.
+    - article [ref=e14]:
+      - strong [ref=e15]: Protegido
+      - generic [ref=e16]: La parte publica no muestra datos personales ni fichas reales.
+    - article [ref=e17]:
+      - strong [ref=e18]: Sencillo
+      - generic [ref=e19]: Pensado para un grupo pequeno que necesita coordinarse sin duplicar trabajo.
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]: Email autorizado
+      - textbox "Email autorizado" [ref=e23]:
+        - /placeholder: tu-correo@ejemplo.org
+    - generic [ref=e24]:
+      - generic [ref=e25]: Contrasena
+      - textbox "Contrasena" [ref=e26]:
+        - /placeholder: Tu contrasena
+    - generic [ref=e27]:
+      - button "Entrar" [ref=e28] [cursor=pointer]
+      - link "Volver a la pagina publica" [ref=e29] [cursor=pointer]:
+        - /url: ./
+    - status [ref=e30]: Inicia sesion con tu correo y contrasena para abrir el area privada.

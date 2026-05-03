@@ -1,0 +1,20 @@
+- generic [ref=e3]:
+  - img "Sindicato Socialista de Vivienda" [ref=e4]
+  - paragraph [ref=e5]: Area privada del equipo
+  - heading "Entrar" [level=1] [ref=e6]
+  - paragraph [ref=e7]: Usa tu usuario autorizado para abrir los casos guardados y continuar el seguimiento.
+  - status [ref=e8]: La portada publica explica la herramienta. Los casos reales solo se guardan aqui.
+  - generic [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]: Email autorizado
+      - textbox "Email autorizado" [ref=e12]:
+        - /placeholder: tu-correo@ejemplo.org
+    - generic [ref=e13]:
+      - generic [ref=e14]: Contrasena
+      - textbox "Contrasena" [ref=e15]:
+        - /placeholder: Tu contrasena
+    - generic [ref=e16]:
+      - button "Entrar" [ref=e17] [cursor=pointer]
+      - link "Volver a la pagina publica" [ref=e18] [cursor=pointer]:
+        - /url: ./
+    - status [ref=e19]: Inicia sesion con tu correo y contrasena para abrir el area privada.

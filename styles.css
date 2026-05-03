@@ -158,11 +158,15 @@ img {
 
 .landing-simple-hero,
 .landing-simple-section {
-  padding: 32px;
+  padding: 28px;
 }
 
 .landing-simple-hero {
   text-align: left;
+}
+
+.landing-simple-hero .brand-logo {
+  margin-bottom: 16px;
 }
 
 .landing-simple-notice {
@@ -170,16 +174,16 @@ img {
 }
 
 .landing-actions-large .landing-link {
-  min-height: 62px;
-  min-width: 260px;
-  font-size: 1.1rem;
+  min-height: 56px;
+  min-width: 240px;
+  font-size: 1.05rem;
 }
 
 .landing-simple-card-grid,
 .landing-simple-step-grid,
 .landing-simple-links {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .landing-simple-card-grid {
@@ -190,22 +194,35 @@ img {
 .landing-simple-step,
 .landing-simple-link {
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 14px;
   background: #fffaf4;
-  padding: 22px 24px;
+  padding: 16px 20px;
 }
 
 .landing-simple-step {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.landing-simple-step h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+}
+
+.landing-simple-step p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .landing-simple-link {
   color: var(--accent);
   text-decoration: none;
   font-weight: 700;
+  padding: 14px 18px;
 }
 
 .landing-step-number {
@@ -215,14 +232,11 @@ img {
   border-radius: 999px;
   font-weight: 700;
   flex-shrink: 0;
-}
-
-.landing-step-number {
-  width: 38px;
-  height: 38px;
-  margin-bottom: 16px;
+  width: 32px;
+  height: 32px;
   background: var(--primary-soft);
   color: var(--primary-strong);
+  font-size: 0.9rem;
 }
 
 .landing-links {
@@ -407,22 +421,35 @@ input.is-linked {
 
 .choice {
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  font-size: 1.05rem;
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: #fffaf4;
+  gap: 12px;
+  align-items: center;
+  font-size: 1rem;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: #fffdfa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.choice:hover {
+  border-color: var(--primary);
+  background: #fff9f2;
+}
+
+.choice:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(225, 115, 33, 0.12);
 }
 
 .choice input[type="radio"],
 .choice input[type="checkbox"] {
-  margin-top: 0.2rem;
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.1rem;
+  height: 1.1rem;
   flex-shrink: 0;
   accent-color: var(--primary);
+  cursor: pointer;
 }
 
 input[type="text"],
@@ -517,12 +544,12 @@ button:active,
   display: none;
 }
 
-/* ── Status pill bar ─────────────────────────────────────── */
+/* ── Status dropdown (compact) ───────────────────────────── */
 
-.status-bar {
+.status-bar.compact {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -531,56 +558,64 @@ button:active,
   flex-wrap: wrap;
 }
 
-.status-bar-label {
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  white-space: nowrap;
-  margin-right: 4px;
+.status-dropdown-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 280px;
 }
 
+.status-dropdown {
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  min-height: 48px;
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: #fffdfa;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.status-dropdown:hover {
+  border-color: var(--primary);
+}
+
+.status-dropdown:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* Status color indicator */
+.status-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.status-indicator.s-nuevo        { background: #94a3b8; }
+.status-indicator.s-reuniendo    { background: #fb923c; }
+.status-indicator.s-lista        { background: var(--primary); }
+.status-indicator.s-presentada   { background: #7c3aed; }
+.status-indicator.s-inicio       { background: #14b8a6; }
+.status-indicator.s-favorable    { background: #16a34a; }
+.status-indicator.s-desfavorable { background: #dc2626; }
+.status-indicator.s-cerrada      { background: #64748b; }
+
+/* Keep old status-pills for backward compatibility if needed */
 .status-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
-
-.status-pill {
-  position: relative;
-  cursor: pointer;
-}
-
-.status-pill input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.status-pill span {
-  display: inline-block;
-  padding: 10px 16px;
-  border-radius: 999px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border: 2px solid transparent;
-  background: var(--bg);
-  color: var(--muted);
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.status-pill:hover span { filter: brightness(0.95); }
-
-.status-pill.s-nuevo:has(input:checked)        span { background: #e2e8f0; color: #334155; border-color: #94a3b8; }
-.status-pill.s-reuniendo:has(input:checked)    span { background: var(--warn-bg); color: var(--warn); border-color: #fb923c; }
-.status-pill.s-lista:has(input:checked)        span { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
-.status-pill.s-presentada:has(input:checked)   span { background: #ede9fe; color: #5b21b6; border-color: #7c3aed; }
-.status-pill.s-inicio:has(input:checked)       span { background: #ccfbf1; color: #0f766e; border-color: #14b8a6; }
-.status-pill.s-favorable:has(input:checked)    span { background: var(--ok-bg); color: var(--ok); border-color: #16a34a; }
-.status-pill.s-desfavorable:has(input:checked) span { background: var(--stop-bg); color: var(--stop); border-color: #dc2626; }
-.status-pill.s-cerrada:has(input:checked)      span { background: #f1f5f9; color: #475569; border-color: #64748b; }
 
 .status-card,
 .notice,
@@ -929,8 +964,79 @@ td .table-action {
   .landing-simple-hero,
   .landing-simple-section,
   .panel {
-    padding: 16px;
-    border-radius: 16px;
+    padding: 20px;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .secondary-link,
+  .landing-link {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+  .landing-actions {
+    display: grid;
+    gap: 10px;
+  }
+
+  .landing-actions-large .landing-link {
+    min-height: 48px;
+    min-width: 0;
+    font-size: 1rem;
+  }
+
+  .landing-simple-card-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .landing-simple-step-grid {
+    gap: 10px;
+  }
+
+  .landing-simple-card,
+  .landing-simple-step,
+  .landing-simple-link,
+  .subpanel {
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+
+  .landing-simple-step {
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .landing-simple-step h3 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  .landing-simple-step p {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .landing-step-number {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 0;
+    font-size: 0.85rem;
+  }
+
+  .landing-simple-links {
+    gap: 8px;
+  }
+
+  .landing-simple-link {
+    padding: 12px 16px;
+    font-size: 0.95rem;
   }
 
   button {
@@ -1043,16 +1149,35 @@ td .table-action {
   }
 
   /* Status bar improvements for mobile */
-  .status-bar {
+  .status-bar.compact {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
     padding: 12px;
   }
 
+  .status-dropdown-field {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .status-dropdown {
+    max-width: none;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
   .status-bar-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     margin-right: 0;
+  }
+
+  .status-indicator {
+    display: none;
   }
 
   .status-pills {
@@ -1214,8 +1339,18 @@ td .table-action {
 
   /* Step help */
   details.step-help {
-    margin: 8px 0 12px 0;
+    margin: 8px 0 10px 0;
     padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  details.step-help summary {
+    font-size: 0.9rem;
+  }
+
+  details.step-help p {
+    margin-top: 8px;
+    padding-top: 8px;
   }
 
   /* Pending summary */
@@ -1335,9 +1470,10 @@ td .table-action {
   }
 
   .choice {
-    padding: 10px 12px;
-    font-size: 0.9rem;
-    gap: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    gap: 10px;
+    border-radius: 10px;
   }
 
   .choice input[type="radio"],
@@ -1495,26 +1631,59 @@ td .table-action {
   }
 }
 
-/* Step help details */
+/* Step help details - modern pill style */
 details.step-help {
-  margin: 6px 0 10px 20px;
-  background: var(--primary-light);
-  border-left: 3px solid var(--primary);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.85em;
+  margin: 8px 0 12px 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
 }
+
 details.step-help summary {
   cursor: pointer;
-  color: var(--primary-strong);
+  color: var(--primary);
   font-weight: 600;
   user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
 }
+
+details.step-help summary::before {
+  content: "?";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+details.step-help summary::-webkit-details-marker {
+  display: none;
+}
+
+details.step-help[open] summary::before {
+  content: "−";
+  background: var(--primary);
+  color: white;
+}
+
 details.step-help p {
-  margin: 6px 0 2px 0;
-  color: var(--text);
+  margin: 10px 0 4px 0;
+  padding-top: 10px;
+  border-top: 1px dashed #cbd5e1;
+  color: var(--muted);
   white-space: pre-line;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-size: 0.9em;
 }
 
 /* Field hint text */

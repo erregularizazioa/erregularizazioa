@@ -43,18 +43,21 @@
           </div>
         </div>
 
-        <div class="status-bar">
-          <span class="status-bar-label" data-i18n="field.status">Estado del caso</span>
-          <div class="status-pills">
-            <label class="status-pill s-nuevo"><input type="radio" name="caseStatus" value="Nuevo" checked><span data-i18n="status.new">Nuevo</span></label>
-            <label class="status-pill s-reuniendo"><input type="radio" name="caseStatus" value="Reuniendo documentos"><span data-i18n="status.gathering">Reuniendo documentos</span></label>
-            <label class="status-pill s-lista"><input type="radio" name="caseStatus" value="Lista para presentar"><span data-i18n="status.ready">Lista para presentar</span></label>
-            <label class="status-pill s-presentada"><input type="radio" name="caseStatus" value="Presentada"><span data-i18n="status.submitted">Presentada</span></label>
-            <label class="status-pill s-inicio"><input type="radio" name="caseStatus" value="Inicio recibido"><span data-i18n="status.started">Inicio recibido</span></label>
-            <label class="status-pill s-favorable"><input type="radio" name="caseStatus" value="Favorable"><span data-i18n="status.favorable">Favorable</span></label>
-            <label class="status-pill s-desfavorable"><input type="radio" name="caseStatus" value="Desfavorable"><span data-i18n="status.unfavorable">Desfavorable</span></label>
-            <label class="status-pill s-cerrada"><input type="radio" name="caseStatus" value="Cerrada"><span data-i18n="status.closed">Cerrada</span></label>
-          </div>
+        <div class="status-bar compact">
+          <label class="status-dropdown-field">
+            <span class="status-bar-label" data-i18n="field.status">Estado del caso</span>
+            <select id="case-status-select" name="caseStatus" class="status-dropdown">
+              <option value="Nuevo" data-i18n="status.new" selected>Nuevo</option>
+              <option value="Reuniendo documentos" data-i18n="status.gathering">Reuniendo documentos</option>
+              <option value="Lista para presentar" data-i18n="status.ready">Lista para presentar</option>
+              <option value="Presentada" data-i18n="status.submitted">Presentada</option>
+              <option value="Inicio recibido" data-i18n="status.started">Inicio recibido</option>
+              <option value="Favorable" data-i18n="status.favorable">Favorable</option>
+              <option value="Desfavorable" data-i18n="status.unfavorable">Desfavorable</option>
+              <option value="Cerrada" data-i18n="status.closed">Cerrada</option>
+            </select>
+          </label>
+          <div class="status-indicator" id="status-indicator"></div>
         </div>
 
         <div class="field-grid two-columns">

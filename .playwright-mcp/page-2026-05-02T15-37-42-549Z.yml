@@ -1,0 +1,159 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: Regularizacion extraordinaria 2026
+      - generic [ref=e6]:
+        - button "ES" [ref=e7] [cursor=pointer]
+        - button "FR" [ref=e8] [cursor=pointer]
+    - heading "Ficha unica de caso" [level=1] [ref=e9]
+    - paragraph [ref=e10]: Aqui puedes explorar el simulador y la orientacion del caso sin guardar datos. La version publica sirve para explicar la logica, revisar requisitos y compartir la herramienta de forma abierta.
+    - status [ref=e11]: Esta version publica solo muestra el simulador y la orientacion. No guarda casos ni exporta datos.
+  - generic [ref=e13]:
+    - generic [ref=e15]:
+      - heading "Ficha del caso" [level=2] [ref=e16]
+      - paragraph [ref=e17]: Rellena la ficha y marca la documentacion y los pasos a medida que el caso avanza.
+    - generic [ref=e18]:
+      - generic [ref=e19]: Estado del caso
+      - generic [ref=e20]:
+        - generic [ref=e21] [cursor=pointer]:
+          - radio "Nuevo" [checked]
+          - generic [ref=e22]: Nuevo
+        - generic [ref=e23] [cursor=pointer]:
+          - radio "Reuniendo documentos"
+          - generic [ref=e24]: Reuniendo documentos
+        - generic [ref=e25] [cursor=pointer]:
+          - radio "Lista para presentar"
+          - generic [ref=e26]: Lista para presentar
+        - generic [ref=e27] [cursor=pointer]:
+          - radio "Presentada"
+          - generic [ref=e28]: Presentada
+        - generic [ref=e29] [cursor=pointer]:
+          - radio "Inicio recibido"
+          - generic [ref=e30]: Inicio recibido
+        - generic [ref=e31] [cursor=pointer]:
+          - radio "Favorable"
+          - generic [ref=e32]: Favorable
+        - generic [ref=e33] [cursor=pointer]:
+          - radio "Desfavorable"
+          - generic [ref=e34]: Desfavorable
+        - generic [ref=e35] [cursor=pointer]:
+          - radio "Cerrada"
+          - generic [ref=e36]: Cerrada
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e39]: Nombre o alias
+        - textbox "Nombre o alias" [ref=e40]:
+          - /placeholder: Ej. Amina / Caso Bilbao 03
+      - generic [ref=e41]:
+        - generic [ref=e42]: Telefono
+        - textbox "600123123" [ref=e43]
+      - generic [ref=e44]:
+        - generic [ref=e45]: Email
+        - textbox "correo@ejemplo.org" [ref=e46]
+      - generic [ref=e47]:
+        - generic [ref=e48]: Municipio
+        - textbox "Municipio" [ref=e49]:
+          - /placeholder: Bergara
+          - text: Bergara
+      - generic [ref=e50]:
+        - generic [ref=e51]: Persona voluntaria
+        - textbox "Persona voluntaria" [ref=e52]:
+          - /placeholder: Nombre de quien hace seguimiento
+      - generic [ref=e53]:
+        - generic [ref=e54]: Representante
+        - textbox "Representante" [ref=e55]:
+          - /placeholder: Nombre de la persona o entidad representante
+      - generic [ref=e56]:
+        - generic [ref=e57]: Telefono representante
+        - textbox "Telefono representante" [ref=e58]:
+          - /placeholder: "600123123"
+      - generic [ref=e59]:
+        - generic [ref=e60]: Email representante
+        - textbox "Email representante" [ref=e61]:
+          - /placeholder: representante@ejemplo.org
+      - generic [ref=e62]:
+        - generic [ref=e63]: A quien llegan preferentemente las notificaciones
+        - combobox "A quien llegan preferentemente las notificaciones Si el caso lo lleva una persona representante, las notificaciones posteriores suelen llegarle a ella de forma preferente." [ref=e64]:
+          - option "Persona solicitante" [selected]
+          - option "Representante"
+        - generic [ref=e65]: Si el caso lo lleva una persona representante, las notificaciones posteriores suelen llegarle a ella de forma preferente.
+      - generic [ref=e66]:
+        - generic [ref=e67]: Fecha del siguiente paso
+        - textbox "Fecha del siguiente paso Fecha de la proxima cita, reunion o gestion pendiente (p. ej. cita en Mercurio, llamada de seguimiento)." [ref=e68]
+        - generic [ref=e69]: Fecha de la proxima cita, reunion o gestion pendiente (p. ej. cita en Mercurio, llamada de seguimiento).
+    - group "Analisis del caso" [ref=e70]:
+      - generic [ref=e71]: Analisis del caso
+      - generic [ref=e72]:
+        - generic [ref=e73]: "1"
+        - generic [ref=e74]: "2"
+        - generic [ref=e75]: "3"
+        - generic [ref=e76]: "4"
+        - generic [ref=e77]: "5"
+        - generic [ref=e78]: "6"
+        - generic [ref=e79]: "Paso 1 de 6: La persona"
+      - generic [ref=e80]:
+        - paragraph [ref=e81]: → Quien va a hacer la solicitud?
+        - generic [ref=e82]:
+          - radio "Persona adulta" [checked] [ref=e83]
+          - generic [ref=e84]: Persona adulta
+        - generic [ref=e85]:
+          - radio "Menor de edad o hijo/a que iria con su familia" [ref=e86]
+          - generic [ref=e87]: Menor de edad o hijo/a que iria con su familia
+      - button "Siguiente →" [ref=e89] [cursor=pointer]
+    - generic [ref=e90]:
+      - generic [ref=e91]:
+        - heading "Diagnostico del caso" [level=3] [ref=e92]
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - heading "Con estos datos no parece que encaje en esta via" [level=3] [ref=e95]
+            - paragraph [ref=e96]: La documentacion revisada exige presencia en Espana antes del 1 de enero de 2026 y 5 meses seguidos de permanencia antes de solicitar.
+          - generic [ref=e97]: Otra via
+          - generic [ref=e98]:
+            - heading "Observaciones" [level=4] [ref=e99]
+            - list [ref=e100]:
+              - listitem [ref=e101]: Ambos requisitos aparecen como condiciones generales del procedimiento.
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - strong [ref=e104]: Documentos pendientes
+              - text: Nada pendiente
+            - generic [ref=e105]:
+              - strong [ref=e106]: Pasos pendientes
+              - text: Revisar si se pueden conseguir mejores pruebas de estancia o permanencia. | Si no es posible, estudiar otras vias ordinarias.
+          - paragraph [ref=e107]: Orientacion basada en la documentacion oficial extraida del BOE, preguntas y respuestas publicas y folleto informativo incluido en esta carpeta.
+      - generic [ref=e108]:
+        - heading "Documentacion a revisar" [level=3] [ref=e109]
+        - paragraph [ref=e111]: No hay una lista de documentos especifica para este supuesto.
+      - generic [ref=e112]:
+        - heading "Pasos del proceso" [level=3] [ref=e113]
+        - generic [ref=e115]:
+          - generic [ref=e116]:
+            - checkbox "1. Revisar si se pueden conseguir mejores pruebas de estancia o permanencia." [ref=e117]
+            - generic [ref=e118]: "1."
+            - generic [ref=e119]: Revisar si se pueden conseguir mejores pruebas de estancia o permanencia.
+          - generic [ref=e120]:
+            - checkbox "2. Si no es posible, estudiar otras vias ordinarias." [ref=e121]
+            - generic [ref=e122]: "2."
+            - generic [ref=e123]: Si no es posible, estudiar otras vias ordinarias.
+    - generic [ref=e124]:
+      - generic [ref=e125]: Proximo paso recomendado
+      - textbox "Proximo paso recomendado" [ref=e126]:
+        - /placeholder: La ficha lo ira sugiriendo automaticamente, pero puedes ajustarlo
+        - text: Revisar si se pueden conseguir mejores pruebas de estancia o permanencia.
+    - generic [ref=e127]:
+      - generic [ref=e128]: Notas del caso
+      - textbox "Notas del caso" [ref=e129]:
+        - /placeholder: Observaciones, bloqueos o detalles de seguimiento
+    - generic [ref=e130]:
+      - button "Limpiar ficha" [ref=e131] [cursor=pointer]
+      - button "Imprimir ficha" [ref=e132] [cursor=pointer]
+      - button "Copiar resumen" [ref=e133] [cursor=pointer]
+  - generic [ref=e135]:
+    - heading "Enlaces oficiales utiles" [level=2] [ref=e136]
+    - list [ref=e137]:
+      - listitem [ref=e138]:
+        - link "Portal de regularizacion" [ref=e139] [cursor=pointer]:
+          - /url: https://www.inclusion.gob.es/regularizacion
+      - listitem [ref=e140]:
+        - link "Plataforma Mercurio" [ref=e141] [cursor=pointer]:
+          - /url: https://mercurio.delegaciondelgobierno.gob.es/mercurio/
+      - listitem [ref=e142]: Telefono 060 para dudas y cita previa.

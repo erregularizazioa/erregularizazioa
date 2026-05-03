@@ -1,0 +1,48 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - img "Sindicato Socialista de Vivienda" [ref=e4]
+    - paragraph [ref=e5]: Sindicato Socialista de Vivienda · Regularizacion 2026
+    - heading "Una herramienta clara para orientar y seguir casos" [level=1] [ref=e6]
+    - paragraph [ref=e7]: Esta pagina explica la herramienta y da acceso al espacio privado del equipo. La portada publica no guarda datos personales.
+    - status [ref=e8]: Si necesitas trabajar con casos reales, entra al area privada.
+    - link "Entrar al area privada" [ref=e10] [cursor=pointer]:
+      - /url: ./private.html
+  - generic [ref=e11]:
+    - paragraph [ref=e12]: Como funciona
+    - heading "Solo hay dos espacios" [level=2] [ref=e13]
+    - generic [ref=e14]:
+      - article [ref=e15]:
+        - heading "Pagina publica" [level=3] [ref=e16]
+        - paragraph [ref=e17]: Sirve para explicar la herramienta y compartir orientacion general.
+      - article [ref=e18]:
+        - heading "Area privada" [level=3] [ref=e19]
+        - paragraph [ref=e20]: Sirve para entrar con usuario autorizado y guardar casos del equipo.
+  - generic [ref=e21]:
+    - paragraph [ref=e22]: Uso diario
+    - heading "Tres pasos faciles" [level=2] [ref=e23]
+    - generic [ref=e24]:
+      - article [ref=e25]:
+        - generic [ref=e26]: "1"
+        - generic [ref=e27]:
+          - heading "Leer el caso" [level=3] [ref=e28]
+          - paragraph [ref=e29]: La herramienta ayuda a ordenar la situacion desde el primer contacto.
+      - article [ref=e30]:
+        - generic [ref=e31]: "2"
+        - generic [ref=e32]:
+          - heading "Preparar la documentacion" [level=3] [ref=e33]
+          - paragraph [ref=e34]: Recoge documentos, notas y el siguiente paso recomendado.
+      - article [ref=e35]:
+        - generic [ref=e36]: "3"
+        - generic [ref=e37]:
+          - heading "Seguir el expediente" [level=3] [ref=e38]
+          - paragraph [ref=e39]: El equipo puede ver el estado y continuar el seguimiento compartido.
+  - generic [ref=e40]:
+    - paragraph [ref=e41]: Enlaces utiles
+    - heading "Accesos importantes" [level=2] [ref=e42]
+    - generic [ref=e43]:
+      - link "Acceso privado del equipo" [ref=e44] [cursor=pointer]:
+        - /url: ./private.html
+      - link "Portal oficial de regularizacion" [ref=e45] [cursor=pointer]:
+        - /url: https://www.inclusion.gob.es/regularizacion
+      - link "Plataforma Mercurio" [ref=e46] [cursor=pointer]:
+        - /url: https://mercurio.delegaciondelgobierno.gob.es/mercurio/

@@ -82,6 +82,8 @@ const guidanceSteps         = document.getElementById("guidance-steps");
 const caseSummary           = document.getElementById("case-summary");
 const caseSearchField       = document.getElementById("case-search");
 const caseStatusFilterField = document.getElementById("case-status-filter");
+const caseStatusSelectField = document.getElementById("case-status-select");
+const statusIndicator       = document.getElementById("status-indicator");
 const caseTableBody         = document.getElementById("case-table-body");
 const caseEmpty             = document.getElementById("case-empty");
 const casesPanel            = document.getElementById("cases-panel");
@@ -167,6 +169,22 @@ function clearStorageMessage() {
 function setStorageMessage(text, tone) {
   storageMessage.textContent = text;
   storageMessage.className = "notice " + (tone || "info");
+}
+
+// Status indicator helper
+function updateStatusIndicator(status) {
+  if (!statusIndicator) return;
+  var classMap = {
+    "Nuevo": "s-nuevo",
+    "Reuniendo documentos": "s-reuniendo",
+    "Lista para presentar": "s-lista",
+    "Presentada": "s-presentada",
+    "Inicio recibido": "s-inicio",
+    "Favorable": "s-favorable",
+    "Desfavorable": "s-desfavorable",
+    "Cerrada": "s-cerrada"
+  };
+  statusIndicator.className = "status-indicator " + (classMap[status] || "s-nuevo");
 }
 
 function applyRuntimeMode() {
@@ -631,7 +649,7 @@ function collectCaseFormData() {
     presentationMercurioReady: getFieldValue(casePresentationMercurioReadyField).trim(),
     presentationDate: getFieldValue(casePresentationDateField).trim(),
     presentationRegistryNumber: getFieldValue(casePresentationRegistryNumberField).trim(),
-    caseStatus: getRadioValue("caseStatus") || "Nuevo",
+    caseStatus: getFieldValue(caseStatusSelectField, "Nuevo"),
     nextDate:   caseNextDateField.value.trim(),
     nextAction: caseNextActionField.value.trim(),
     notes:      caseNotesField.value.trim()
@@ -881,7 +899,8 @@ function clearCaseForm() {
   setFieldValue(casePresentationMercurioReadyField, "");
   setFieldValue(casePresentationDateField, "");
   setFieldValue(casePresentationRegistryNumberField, "");
-  setRadioValue("caseStatus", "Nuevo");
+  setFieldValue(caseStatusSelectField, "Nuevo");
+  updateStatusIndicator("Nuevo");
   document.getElementById("phone-error").classList.add("hidden");
   document.getElementById("email-error").classList.add("hidden");
   currentChecks = {};
@@ -915,7 +934,8 @@ function populateCaseForm(caseItem) {
   setFieldValue(casePresentationMercurioReadyField, c.presentationMercurioReady || "");
   setFieldValue(casePresentationDateField, c.presentationDate || "");
   setFieldValue(casePresentationRegistryNumberField, c.presentationRegistryNumber || "");
-  setRadioValue("caseStatus", c.caseStatus || "Nuevo");
+  setFieldValue(caseStatusSelectField, c.caseStatus || "Nuevo");
+  updateStatusIndicator(c.caseStatus || "Nuevo");
   caseNextDateField.value     = c.nextDate;
   caseNotesField.value        = c.notes;
   caseNextActionField.value   = c.nextAction;
@@ -1000,6 +1020,13 @@ if (caseRepresentativeProfileField) {
     } else {
       clearStorageMessage();
     }
+  });
+}
+
+// Status dropdown change listener
+if (caseStatusSelectField) {
+  caseStatusSelectField.addEventListener("change", function() {
+    updateStatusIndicator(this.value);
   });
 }
 
