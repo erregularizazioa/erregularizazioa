@@ -335,7 +335,7 @@ legend {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .toolbar,
@@ -358,8 +358,11 @@ legend {
 
 .guidance-grid {
   display: grid;
-  gap: 16px;
+  gap: 20px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 20px 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
 .guidance-diagnosis {
@@ -367,16 +370,37 @@ legend {
 }
 
 .subpanel {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
-  background: #fff9f2;
+  padding: 0;
+  background: transparent;
+}
+
+.subpanel h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 fieldset {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 24px 0;
+}
+
+fieldset legend {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  padding: 0 0 12px 0;
+  margin-bottom: 8px;
+  border-bottom: 2px solid var(--primary);
+  width: 100%;
+  display: block;
 }
 
 label,
@@ -544,17 +568,15 @@ button:active,
   display: none;
 }
 
-/* ── Status dropdown (compact) ───────────────────────────── */
+/* ── Status dropdown (integrated) ────────────────────────── */
 
 .status-bar.compact {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 18px;
-  margin-bottom: 14px;
+  gap: 12px;
+  padding: 8px 0 16px 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
 
@@ -1082,9 +1104,18 @@ td .table-action {
     font-size: 0.9rem;
   }
 
-  .private-userbar,
-  fieldset {
+  .private-userbar {
     padding: 12px;
+  }
+
+  fieldset {
+    margin: 20px 0;
+  }
+
+  fieldset legend {
+    font-size: 1rem;
+    padding-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .form-grid,
@@ -1150,10 +1181,10 @@ td .table-action {
 
   /* Status bar improvements for mobile */
   .status-bar.compact {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    padding: 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0 12px 0;
   }
 
   .status-dropdown-field {
@@ -1326,10 +1357,18 @@ td .table-action {
   /* Guidance grid mobile */
   .guidance-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 16px 0;
+    padding-top: 16px;
   }
 
   .guidance-diagnosis {
     grid-column: 1;
+  }
+
+  .subpanel h3 {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
   }
 
   /* Field hints */
@@ -1461,12 +1500,18 @@ td .table-action {
   }
 
   .private-userbar,
-  fieldset,
   .landing-simple-card,
   .landing-simple-step,
-  .landing-simple-link,
-  .subpanel {
+  .landing-simple-link {
     padding: 12px;
+  }
+
+  fieldset {
+    margin: 16px 0;
+  }
+
+  .subpanel {
+    padding: 0;
   }
 
   .choice {
