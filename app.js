@@ -18,6 +18,8 @@
   var clearButton = document.getElementById("clear-case-button");
   var captchaShell = document.getElementById("captcha-shell");
   var captchaContainer = document.getElementById("submit-captcha");
+  var nextStepsPanel = document.getElementById("next-steps-panel");
+  var nextStepsList = document.getElementById("next-steps-list");
 
   function t(key) {
     return (T[currentLang] && T[currentLang].ui && T[currentLang].ui[key]) ||
@@ -120,11 +122,74 @@
     return "PUB-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 8).toUpperCase();
   }
 
+  function buildGuidance(payload) {
+    var answers = payload.answers || {};
+    var steps = [];
+
+    steps.push(t("nextSteps.contact"));
+
+    if (answers.pendingApplication === "yes") {
+      steps.push(t("nextSteps.pendingApplication"));
+    }
+    if (answers.piBefore2026 === "yes") {
+      steps.push(t("nextSteps.pi"));
+    }
+    if (answers.beforeJan2026 !== "yes") {
+      steps.push(t("nextSteps.before2026Missing"));
+    } else {
+      steps.push(t("nextSteps.before2026"));
+    }
+    if (answers.fiveMonths !== "yes") {
+      steps.push(t("nextSteps.fiveMonths"));
+    }
+    if (answers.identityDocument !== "yes") {
+      steps.push(t("nextSteps.identity"));
+    }
+    if (answers.irregularOptions && answers.irregularOptions.length) {
+      steps.push(t("nextSteps.irregularOptions"));
+    } else {
+      steps.push(t("nextSteps.irregularOptionsMissing"));
+    }
+    if (payload.personType === "minor" || payload.personType === "family") {
+      steps.push(t("nextSteps.family"));
+    }
+    if (getChecked("vulnerability")) {
+      steps.push(t("nextSteps.vulnerability"));
+    }
+
+    var uniqueSteps = steps.filter(function(step, index) {
+      return step && steps.indexOf(step) === index;
+    }).slice(0, 6);
+
+    return {
+      type: "initial-public-guidance",
+      generatedAt: new Date().toISOString(),
+      language: currentLang,
+      items: uniqueSteps
+    };
+  }
+
+  function renderGuidance(guidance) {
+    if (!nextStepsPanel || !nextStepsList) return;
+    nextStepsList.innerHTML = (guidance.items || []).map(function(item) {
+      return "<li>" + item.replace(/[&<>'\"]/g, function(char) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "'": "&#39;",
+          "\"": "&quot;"
+        }[char];
+      }) + "</li>";
+    }).join("");
+    nextStepsPanel.classList.remove("hidden");
+  }
+
   function collectPayload() {
     var now = new Date().toISOString();
     var id = idField.value || createPublicId();
     idField.value = id;
-    return {
+    var payload = {
       id: id,
       source: "public-intake",
       caseStatus: "Nuevo",
@@ -153,6 +218,8 @@
       createdAt: now,
       updatedAt: now
     };
+    payload.publicGuidance = buildGuidance(payload);
+    return payload;
   }
 
   async function submitPayload(payload) {
@@ -189,6 +256,8 @@
     idField.value = "";
     idPreview.textContent = "";
     idPreview.classList.add("hidden");
+    if (nextStepsPanel) nextStepsPanel.classList.add("hidden");
+    if (nextStepsList) nextStepsList.innerHTML = "";
     setMessage("", "info");
     resetCaptcha();
   });
@@ -210,6 +279,7 @@
 
     try {
       var saved = await submitPayload(collectPayload());
+      renderGuidance(saved.publicGuidance || buildGuidance(saved));
       idPreview.textContent = saved.id || idField.value;
       idPreview.classList.remove("hidden");
       setMessage(t("msg.saved.format").replace("{id}", saved.id || idField.value), "success");

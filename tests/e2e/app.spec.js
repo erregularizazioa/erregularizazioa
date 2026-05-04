@@ -46,6 +46,9 @@ test("submits a lightweight public intake payload", async ({ page }) => {
 
   await expect(page.locator("#storage-message")).toContainText(/Solicitud PUB-|enviada/i);
   await expect(page.locator("#case-id-preview")).toContainText("PUB-");
+  await expect(page.locator("#next-steps-panel")).toBeVisible();
+  await expect(page.locator("#next-steps-list li")).toHaveCount(5);
+  await expect(page.locator("#next-steps-list")).toContainText(/España antes del 1 de enero de 2026/i);
 
   const submitted = await page.evaluate(() => window.__submittedBody);
   expect(submitted.captchaToken).toBe("test-captcha-token");
@@ -56,6 +59,8 @@ test("submits a lightweight public intake payload", async ({ page }) => {
   expect(submitted.payload.answers.beforeJan2026).toBe("yes");
   expect(submitted.payload.answers.irregularOptions).toContain("work");
   expect(submitted.payload.privacyConsent).toBe(true);
+  expect(submitted.payload.publicGuidance.items.length).toBe(5);
+  expect(submitted.payload.publicGuidance.type).toBe("initial-public-guidance");
 });
 
 test("requires phone or email and consent", async ({ page }) => {

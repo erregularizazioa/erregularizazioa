@@ -389,6 +389,35 @@ legend {
   border-bottom: 1px solid var(--border);
 }
 
+.next-steps-panel {
+  margin-top: 8px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--info-bg);
+  color: var(--ink);
+}
+
+.next-steps-panel h2 {
+  margin: 4px 0 8px;
+  font-size: 1.35rem;
+}
+
+.next-steps-list {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.next-steps-list li {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border);
+}
+
 fieldset {
   border: none;
   border-radius: 0;
