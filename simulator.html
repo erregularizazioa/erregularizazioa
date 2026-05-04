@@ -17,152 +17,21 @@
           <button id="lang-fr" class="lang-btn">FR</button>
         </div>
       </div>
-      <h1 data-i18n="hero.h1">Ficha unica de caso</h1>
-      <p id="hero-intro" class="intro" data-i18n="hero.intro">
-        Aqui se rellena todo en un solo sitio: datos del caso, analisis, documentacion, pasos y seguimiento.
-        Al enviar la ficha, guardaremos la informacion para que el equipo pueda revisar el caso.
+      <h1 data-i18n="simulator.hero.h1">Simulador de casos</h1>
+      <p id="hero-intro" class="intro" data-i18n="simulator.hero.intro">
+        Responde paso a paso para ver una orientacion inicial, la documentacion a revisar y los siguientes pasos posibles.
       </p>
-      <div id="runtime-mode-message" class="notice info hidden" role="status" data-i18n="static.banner">
-        La informacion que envies se guardara para que el equipo pueda revisar tu caso. No se muestra publicamente.
-      </div>
+      <a class="secondary-link" href="./" data-i18n="simulator.backLink">Volver al formulario</a>
     </header>
 
     <section class="panel">
-      <div id="storage-message" class="notice hidden" role="status"></div>
-
       <form id="case-form" class="form-grid">
-        <input id="case-id" type="hidden">
-
         <div class="section-heading">
           <div>
-            <h2 data-i18n="form.heading">Ficha del caso</h2>
-            <p class="note" data-i18n="form.note">Rellena la ficha y marca la documentacion y los pasos a medida que el caso avanza.</p>
-          </div>
-          <div class="toolbar">
-            <span id="case-id-preview" class="id-badge hidden"></span>
+            <h2 data-i18n="analysis.legend">Analisis del caso</h2>
+            <p class="note" data-i18n="simulator.form.note">Este simulador no guarda datos. Solo calcula una orientacion provisional segun las respuestas.</p>
           </div>
         </div>
-
-        <div class="status-bar compact">
-          <label class="status-dropdown-field">
-            <span class="status-bar-label" data-i18n="field.status">Estado del caso</span>
-            <select id="case-status-select" name="caseStatus" class="status-dropdown">
-              <option value="Nuevo" data-i18n="status.new" selected>Nuevo</option>
-              <option value="Reuniendo documentos" data-i18n="status.gathering">Reuniendo documentos</option>
-              <option value="Lista para presentar" data-i18n="status.ready">Lista para presentar</option>
-              <option value="Presentada" data-i18n="status.submitted">Presentada</option>
-              <option value="Inicio recibido" data-i18n="status.started">Inicio recibido</option>
-              <option value="Favorable" data-i18n="status.favorable">Favorable</option>
-              <option value="Desfavorable" data-i18n="status.unfavorable">Desfavorable</option>
-              <option value="Cerrada" data-i18n="status.closed">Cerrada</option>
-            </select>
-          </label>
-          <div class="status-indicator" id="status-indicator"></div>
-        </div>
-
-        <div class="field-grid two-columns">
-          <label class="field">
-            <span data-i18n="field.name">Nombre o alias</span>
-            <input id="case-name" type="text" data-i18n-placeholder="field.name.placeholder" placeholder="Ej. Amina / Caso Bilbao 03" required>
-          </label>
-
-          <div class="field">
-            <span data-i18n="field.phone">Telefono</span>
-            <input id="case-phone" type="tel" data-i18n-placeholder="field.phone.placeholder" placeholder="600123123" autocomplete="off">
-            <span class="field-error hidden" id="phone-error" data-i18n="error.phone">&#9888; Formato no valido (ej. 600123123)</span>
-          </div>
-
-          <div class="field">
-            <span data-i18n="field.email">Email</span>
-            <input id="case-email" type="email" data-i18n-placeholder="field.email.placeholder" placeholder="correo@ejemplo.org" autocomplete="off">
-            <span class="field-error hidden" id="email-error" data-i18n="error.email">&#9888; Formato de email no valido</span>
-          </div>
-
-          <label class="field">
-            <span data-i18n="field.locality">Municipio</span>
-            <input id="case-locality" type="text" value="Bergara" placeholder="Bergara">
-          </label>
-
-          <label class="field">
-            <span data-i18n="field.volunteer">Persona voluntaria</span>
-            <input id="case-volunteer" type="text" data-i18n-placeholder="field.volunteer.placeholder" placeholder="Nombre de quien hace seguimiento">
-          </label>
-
-          <label class="field">
-            <span data-i18n="field.representativeProfile">Representante guardado</span>
-            <select id="case-representative-profile">
-              <option value="" data-i18n="field.representativeProfile.empty">Sin enlace guardado / datos manuales</option>
-            </select>
-            <span class="field-hint" data-i18n="field.representativeProfile.hint">Selecciona una ficha guardada. Si prefieres un contacto puntual, deja este selector vacio y escribe abajo.</span>
-          </label>
-
-          <label class="field">
-            <span data-i18n="field.representativeName">Representante</span>
-            <input id="case-representative-name" type="text" data-i18n-placeholder="field.representativeName.placeholder" placeholder="Nombre de la persona o entidad representante">
-          </label>
-
-          <label class="field">
-            <span data-i18n="field.representativePhone">Telefono representante</span>
-            <input id="case-representative-phone" type="tel" data-i18n-placeholder="field.representativePhone.placeholder" placeholder="600123123" autocomplete="off">
-          </label>
-
-          <label class="field">
-            <span data-i18n="field.representativeEmail">Email representante</span>
-            <input id="case-representative-email" type="email" data-i18n-placeholder="field.representativeEmail.placeholder" placeholder="representante@ejemplo.org" autocomplete="off">
-            <span class="field-hint" id="case-representative-mode-hint" data-i18n="field.representativeData.hint.manual">Sin ficha enlazada: puedes escribir un contacto puntual solo para este caso.</span>
-          </label>
-
-          <label class="field">
-            <span data-i18n="field.notificationTarget">A quien llegan preferentemente las notificaciones</span>
-            <select id="case-notification-target">
-              <option value="persona" data-i18n="notificationTarget.persona">Persona solicitante</option>
-              <option value="representante" data-i18n="notificationTarget.representante">Representante</option>
-            </select>
-            <span class="field-hint" data-i18n="field.notificationTarget.hint">Si el caso lo lleva una persona representante, las notificaciones posteriores suelen llegarle a ella de forma preferente.</span>
-          </label>
-
-          <details id="representative-directory-panel" class="subpanel representative-directory-panel">
-            <summary data-i18n="representatives.directory.legend">Agenda de representantes</summary>
-            <p class="note" data-i18n="representatives.directory.note">Guarda aqui las fichas reutilizables. Luego el caso solo tiene que enlazar una de ellas.</p>
-
-            <label class="field">
-              <span data-i18n="representatives.directory.select">Ficha de la agenda</span>
-              <select id="representative-directory-select">
-                <option value="" data-i18n="representatives.directory.select.empty">Nueva ficha</option>
-              </select>
-            </label>
-
-            <div class="field-grid two-columns">
-              <label class="field">
-                <span data-i18n="field.representativeName">Representante</span>
-                <input id="representative-directory-name" type="text" data-i18n-placeholder="field.representativeName.placeholder" placeholder="Nombre de la persona o entidad representante">
-              </label>
-
-              <label class="field">
-                <span data-i18n="field.representativePhone">Telefono representante</span>
-                <input id="representative-directory-phone" type="tel" data-i18n-placeholder="field.representativePhone.placeholder" placeholder="600123123" autocomplete="off">
-              </label>
-            </div>
-
-            <label class="field">
-              <span data-i18n="field.representativeEmail">Email representante</span>
-              <input id="representative-directory-email" type="email" data-i18n-placeholder="field.representativeEmail.placeholder" placeholder="representante@ejemplo.org" autocomplete="off">
-            </label>
-
-            <div class="actions representative-directory-actions">
-              <button type="button" id="new-representative-button" class="secondary" data-i18n="btn.newRepresentative">Nueva ficha</button>
-              <button type="button" id="save-representative-button" data-i18n="btn.saveRepresentative">Guardar ficha</button>
-            </div>
-          </details>
-
-          <label class="field">
-            <span data-i18n="field.nextDate">Fecha del siguiente paso</span>
-            <input id="case-next-date" type="date">
-            <span class="field-hint" data-i18n="field.nextDate.hint">Fecha de la proxima cita, reunion o gestion pendiente (p. ej. cita en Mercurio, llamada de seguimiento).</span>
-          </label>
-        </div>
-
-        <div id="duplicate-warning" class="notice warn hidden" role="status"></div>
 
         <fieldset id="analysis-fieldset">
           <legend data-i18n="analysis.legend">Analisis del caso</legend>
@@ -350,81 +219,9 @@
           </div>
         </div>
 
-        <label class="field">
-          <span data-i18n="field.nextAction">Proximo paso recomendado</span>
-          <textarea id="case-next-action" rows="3" data-i18n-placeholder="field.nextAction.placeholder" placeholder="La ficha lo ira sugiriendo automaticamente, pero puedes ajustarlo"></textarea>
-        </label>
-
-        <label class="field">
-          <span data-i18n="field.notes">Notas del caso</span>
-          <textarea id="case-notes" rows="4" data-i18n-placeholder="field.notes.placeholder" placeholder="Observaciones, bloqueos o detalles de seguimiento"></textarea>
-        </label>
-
-        <fieldset>
-          <legend data-i18n="presentation.legend">Preparacion de presentacion</legend>
-          <p class="note" data-i18n="presentation.note">Usa este bloque para dejar claro si el caso puede presentarse por entidad colaboradora y que falta antes de entrar en Mercurio.</p>
-
-          <div class="field-grid two-columns">
-            <label class="field">
-              <span data-i18n="field.presentationByCollaborator">Puede presentar entidad colaboradora</span>
-              <select id="case-presentation-by-collaborator">
-                <option value="" data-i18n="prep.choice.review">Por revisar</option>
-                <option value="yes" data-i18n="prep.choice.yes">Si</option>
-                <option value="no" data-i18n="prep.choice.no">No</option>
-              </select>
-              <span class="field-hint" data-i18n="field.presentationByCollaborator.hint">Marca si una entidad colaboradora con certificado puede asumir la presentacion de este expediente.</span>
-            </label>
-
-            <label class="field">
-              <span data-i18n="field.presentationPresenter">Persona que presentara</span>
-              <input id="case-presentation-presenter" type="text" data-i18n-placeholder="field.presentationPresenter.placeholder" placeholder="Nombre de quien presentara el expediente">
-            </label>
-
-            <label class="field">
-              <span data-i18n="field.presentationAuthorizationSigned">Autorizacion firmada</span>
-              <select id="case-presentation-authorization-signed">
-                <option value="" data-i18n="prep.choice.review">Por revisar</option>
-                <option value="yes" data-i18n="prep.choice.yes">Si</option>
-                <option value="no" data-i18n="prep.choice.no">No</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span data-i18n="field.presentationDocumentsReady">Documentacion completa</span>
-              <select id="case-presentation-documents-ready">
-                <option value="" data-i18n="prep.choice.review">Por revisar</option>
-                <option value="yes" data-i18n="prep.choice.yes">Si</option>
-                <option value="no" data-i18n="prep.choice.no">No</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span data-i18n="field.presentationMercurioReady">Lista para Mercurio</span>
-              <select id="case-presentation-mercurio-ready">
-                <option value="" data-i18n="prep.choice.review">Por revisar</option>
-                <option value="yes" data-i18n="prep.choice.yes">Si</option>
-                <option value="no" data-i18n="prep.choice.no">No</option>
-              </select>
-              <span class="field-hint" data-i18n="field.presentationMercurioReady.hint">Marca si ya se puede entrar a Mercurio y presentar sin rehacer el expediente.</span>
-            </label>
-
-            <label class="field">
-              <span data-i18n="field.presentationDate">Fecha de presentacion</span>
-              <input id="case-presentation-date" type="date">
-            </label>
-
-            <label class="field">
-              <span data-i18n="field.presentationRegistryNumber">Numero de registro</span>
-              <input id="case-presentation-registry-number" type="text" data-i18n-placeholder="field.presentationRegistryNumber.placeholder" placeholder="Resguardo o numero de registro">
-            </label>
-          </div>
-        </fieldset>
         <div class="actions">
-          <button id="save-case-button" type="submit" data-i18n="btn.save">Enviar solicitud</button>
-          <button type="button" id="clear-case-button" class="secondary" data-i18n="btn.clear">Limpiar ficha</button>
-          <button type="button" id="print-button" class="secondary" data-i18n="btn.print">Imprimir ficha</button>
-          <button type="button" id="copy-summary-button" class="secondary" data-i18n="btn.copySummary">Copiar resumen</button>
-          <span id="autosave-indicator" class="autosave-indicator"></span>
+          <button type="button" id="reset-simulator-button" class="secondary" data-i18n="simulator.reset">Reiniciar simulador</button>
+          <a class="secondary-link" href="./" data-i18n="simulator.backLink">Volver al formulario</a>
         </div>
       </form>
     </section>

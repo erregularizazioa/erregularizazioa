@@ -26,10 +26,16 @@ test("build-pages generates public submit form", () => {
   assert.doesNotMatch(publicHtml, /logic\.js/);
   assert.doesNotMatch(publicHtml, /public-landing/);
   assert.match(simulatorHtml, /id="case-form"/);
+  assert.match(simulatorHtml, /id="analysis-fieldset"/);
+  assert.match(simulatorHtml, /id="guidance-preview"/);
   assert.match(simulatorHtml, /logic\.js/);
   assert.match(simulatorHtml, /simulator-app\.js/);
   assert.match(simulatorHtml, /simulator-styles\.css/);
   assert.doesNotMatch(simulatorHtml, /submit-captcha/);
+  assert.doesNotMatch(simulatorHtml, /id="case-name"/);
+  assert.doesNotMatch(simulatorHtml, /presentation\.legend/);
+  assert.doesNotMatch(simulatorHtml, /case-presentation/);
+  assert.doesNotMatch(simulatorHtml, /save-case-button/);
   assert.match(configJs, /captchaSiteKey/);
   assert.match(configJs, /0x4AAAAAADIwsa3zmnhOfgGb/);
   assert.match(configJs, /submitFunctionUrl/);
