@@ -7,6 +7,10 @@ const SHARED_PATHS_TO_COPY = [
   "app.js",
   "translations.js",
   "styles.css",
+  "logic.js",
+  "simulator-app.js",
+  "simulator-translations.js",
+  "simulator-styles.css",
   "pages/config.js",
   "pages/favicon.ico",
   "pages/assets"
@@ -30,6 +34,7 @@ async function main() {
   }));
 
   const appHtml = await fs.promises.readFile(path.join(ROOT_DIR, "index.html"), "utf8");
+  const simulatorHtml = await fs.promises.readFile(path.join(ROOT_DIR, "simulator.html"), "utf8");
   const publicSubmitHtml = appHtml.replace(
     '  <script src="translations.js"></script>\n  <script src="app.js"></script>',
     [
@@ -42,7 +47,7 @@ async function main() {
 
   await Promise.all([
     fs.promises.writeFile(path.join(OUTPUT_DIR, "index.html"), publicSubmitHtml),
-    fs.promises.writeFile(path.join(OUTPUT_DIR, "simulador.html"), publicSubmitHtml)
+    fs.promises.writeFile(path.join(OUTPUT_DIR, "simulador.html"), simulatorHtml)
   ]);
 
   await fs.promises.writeFile(path.join(OUTPUT_DIR, ".nojekyll"), "");

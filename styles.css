@@ -115,6 +115,30 @@ h2 {
   font-weight: 650;
 }
 
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.secondary-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 8px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.secondary-link:hover {
+  background: var(--accent-soft);
+}
+
 .lang-toggle {
   display: inline-flex;
   gap: 6px;

@@ -22,9 +22,14 @@ test("build-pages generates public submit form", () => {
   assert.match(publicHtml, /challenges\.cloudflare\.com\/turnstile/);
   assert.match(publicHtml, /id="submit-captcha"/);
   assert.match(publicHtml, /id="privacy-consent"/);
+  assert.match(publicHtml, /simulador\.html/);
   assert.doesNotMatch(publicHtml, /logic\.js/);
   assert.doesNotMatch(publicHtml, /public-landing/);
   assert.match(simulatorHtml, /id="case-form"/);
+  assert.match(simulatorHtml, /logic\.js/);
+  assert.match(simulatorHtml, /simulator-app\.js/);
+  assert.match(simulatorHtml, /simulator-styles\.css/);
+  assert.doesNotMatch(simulatorHtml, /submit-captcha/);
   assert.match(configJs, /captchaSiteKey/);
   assert.match(configJs, /0x4AAAAAADIwsa3zmnhOfgGb/);
   assert.match(configJs, /submitFunctionUrl/);
