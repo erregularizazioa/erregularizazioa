@@ -7,9 +7,13 @@
   var loginEmail = document.getElementById("login-email");
   var loginPassword = document.getElementById("login-password");
   var loginMessage = document.getElementById("login-message");
+  var captchaShell = document.getElementById("captcha-shell");
+  var captchaContainer = document.getElementById("login-captcha");
   var userBar = document.getElementById("private-userbar");
   var currentUserEmail = document.getElementById("current-user-email");
   var logoutButton = document.getElementById("logout-button");
+  var captchaToken = "";
+  var captchaWidgetId = null;
 
   window.REGULARIZAZIOA_APP_CONFIG = Object.assign({}, window.REGULARIZAZIOA_APP_CONFIG, {
     mode: "web-private"
@@ -36,6 +40,37 @@
 
   function missingConfigError() {
     return new Error("Falta configurar Supabase en pages/config.js.");
+  }
+
+  function captchaEnabled() {
+    return config.captchaProvider === "turnstile" && Boolean(config.captchaSiteKey);
+  }
+
+  function resetCaptcha() {
+    captchaToken = "";
+    if (window.turnstile && captchaWidgetId !== null) {
+      window.turnstile.reset(captchaWidgetId);
+    }
+  }
+
+  function renderCaptchaWhenReady() {
+    if (!captchaEnabled() || !captchaContainer || !captchaShell) return;
+    captchaShell.classList.remove("hidden");
+
+    if (!window.turnstile || typeof window.turnstile.render !== "function") {
+      window.setTimeout(renderCaptchaWhenReady, 250);
+      return;
+    }
+
+    if (captchaWidgetId !== null) return;
+    captchaWidgetId = window.turnstile.render(captchaContainer, {
+      sitekey: config.captchaSiteKey,
+      callback: function(token) {
+        captchaToken = token || "";
+      },
+      "expired-callback": resetCaptcha,
+      "error-callback": resetCaptcha
+    });
   }
 
   if (!window.supabase || !config.url || !config.anonKey) {
@@ -221,16 +256,23 @@
         setAuthMessage("Escribe la contraseña.", "error");
         return;
       }
+      if (captchaEnabled() && !captchaToken) {
+        setAuthMessage("Completa la verificación anti-bots.", "error");
+        return;
+      }
 
       try {
         var result = await supabaseClient.auth.signInWithPassword({
           email: email,
-          password: password
+          password: password,
+          options: captchaEnabled() ? { captchaToken: captchaToken } : undefined
         });
         if (result.error) throw result.error;
         setAuthMessage("", "info");
       } catch (error) {
         setAuthMessage(error.message, "error");
+      } finally {
+        if (captchaEnabled()) resetCaptcha();
       }
     });
   }
@@ -250,4 +292,5 @@
   });
 
   refreshAuthUi();
+  renderCaptchaWhenReady();
 })();

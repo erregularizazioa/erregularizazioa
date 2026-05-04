@@ -130,10 +130,7 @@ test("app.js also loads in static mode without Electron", async () => {
     !document.getElementById("runtime-mode-message").classList.contains("hidden"),
     "Static banner should be visible when Electron is unavailable"
   );
-  assert.ok(
-    document.getElementById("cases-panel").classList.contains("hidden"),
-    "Cases panel should be hidden in static mode"
-  );
+  assert.equal(document.getElementById("cases-panel"), null, "Saved-case table is not part of the simplified public page");
 });
 
 test("static mode blocks save and keeps the page read-only", async () => {
@@ -149,7 +146,7 @@ test("static mode blocks save and keeps the page read-only", async () => {
 
   assert.equal(document.getElementById("case-id-preview").textContent.trim(), "");
   assert.ok(
-    document.getElementById("storage-message").textContent.match(/solo de consulta|lecture seule/i),
+    document.getElementById("storage-message").textContent.match(/no guarda datos|n.enregistre pas/i),
     "Static mode should explain that saving is disabled"
   );
 });
@@ -237,23 +234,13 @@ test("representative profiles can be saved and reused from the form", async () =
   assert.equal(document.getElementById("case-representative-name").readOnly, true);
 });
 
-test("linked representative data is refreshed when loading a saved case", async () => {
+test("linked representative data is refreshed when choosing a saved representative", async () => {
   const { document, appLoadError } = await buildDOM({
     representatives: [{
       id: "REP-00009",
       name: "Entidad central",
       phone: "699000111",
       email: "central@ejemplo.org"
-    }],
-    cases: [{
-      id: "REG-2026-00009",
-      caseName: "Caso enlazado",
-      representativeId: "REP-00009",
-      representativeName: "Entidad antigua",
-      representativePhone: "600000000",
-      representativeEmail: "antigua@ejemplo.org",
-      answers: {},
-      checks: {}
     }]
   });
 
@@ -261,7 +248,9 @@ test("linked representative data is refreshed when loading a saved case", async 
     throw new Error("Skipped because app.js failed to load: " + appLoadError.message);
   }
 
-  document.querySelector('[data-case-id="REG-2026-00009"]').click();
+  const selector = document.getElementById("case-representative-profile");
+  selector.value = "REP-00009";
+  selector.dispatchEvent(new document.defaultView.Event("change", { bubbles: true }));
   await new Promise((r) => setTimeout(r, 50));
 
   assert.equal(document.getElementById("case-representative-profile").value, "REP-00009");

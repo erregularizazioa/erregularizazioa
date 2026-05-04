@@ -1,13 +1,12 @@
 const logic = window.RegularizacionLogic;
 const T = window.TRANSLATIONS;
 const runtimeConfig = window.REGULARIZAZIOA_APP_CONFIG || {};
-const appMode = runtimeConfig.mode === "desktop" || runtimeConfig.mode === "static" || runtimeConfig.mode === "web-private"
+const appMode = runtimeConfig.mode === "static" || runtimeConfig.mode === "web-private"
   ? runtimeConfig.mode
-  : (window.electronAPI ? "desktop" : "static");
+  : (window.electronAPI ? "web-private" : "static");
 const isStaticMode = appMode === "static";
 const isWebPrivateMode = appMode === "web-private";
 const supportsCaseStorage = !isStaticMode;
-const supportsDesktopOnlyTools = appMode === "desktop";
 const electronApi = !isStaticMode && window.electronAPI ? window.electronAPI : null;
 const api = {
   getCases: electronApi && typeof electronApi.getCases === "function"
@@ -25,15 +24,9 @@ const api = {
   saveCase: electronApi && typeof electronApi.saveCase === "function"
     ? electronApi.saveCase.bind(electronApi)
     : async function() { throw new Error("read-only"); },
-  exportExcel: electronApi && typeof electronApi.exportExcel === "function"
-    ? electronApi.exportExcel.bind(electronApi)
-    : async function() { throw new Error("read-only"); },
-  backupDatabase: electronApi && typeof electronApi.backupDatabase === "function"
-    ? electronApi.backupDatabase.bind(electronApi)
-    : async function() { throw new Error("read-only"); },
-  restoreDatabase: electronApi && typeof electronApi.restoreDatabase === "function"
-    ? electronApi.restoreDatabase.bind(electronApi)
-    : async function() { throw new Error("read-only"); }
+  exportExcel: async function() { throw new Error("read-only"); },
+  backupDatabase: async function() { throw new Error("read-only"); },
+  restoreDatabase: async function() { throw new Error("read-only"); }
 };
 
 const caseForm              = document.getElementById("case-form");
@@ -202,11 +195,9 @@ function applyRuntimeMode() {
     if (casesPanel) casesPanel.classList.add("hidden");
   }
 
-  if (!supportsDesktopOnlyTools) {
-    if (backupButton) backupButton.classList.add("hidden");
-    if (restoreButton) restoreButton.classList.add("hidden");
-    if (exportExcelButton) exportExcelButton.classList.add("hidden");
-  }
+  if (backupButton) backupButton.classList.add("hidden");
+  if (restoreButton) restoreButton.classList.add("hidden");
+  if (exportExcelButton) exportExcelButton.classList.add("hidden");
 }
 
 function escapeHtml(value) {
@@ -781,6 +772,7 @@ function buildCaseSummaryText() {
 // Case table
 
 function renderCaseSummaryCards(cases) {
+  if (!caseSummary) return;
   var openCount     = cases.filter(function(c) { return !["Favorable","Desfavorable","Cerrada"].includes(c.caseStatus); }).length;
   var submittedCount = cases.filter(function(c) { return ["Presentada","Inicio recibido","Favorable"].includes(c.caseStatus); }).length;
   var favorableCount = cases.filter(function(c) { return c.caseStatus === "Favorable"; }).length;
@@ -796,8 +788,8 @@ function renderCaseSummaryCards(cases) {
 }
 
 function getFilteredCases() {
-  var search       = caseSearchField.value.trim().toLowerCase();
-  var statusFilter = caseStatusFilterField.value;
+  var search       = caseSearchField ? caseSearchField.value.trim().toLowerCase() : "";
+  var statusFilter = caseStatusFilterField ? caseStatusFilterField.value : "";
   var filtered = casesState.filter(function(c) {
     var matchesStatus = !statusFilter || c.caseStatus === statusFilter;
     var matchesUrgent = !urgentFilterActive || isOverdue(c);
@@ -861,9 +853,10 @@ function renderPresentationCell(caseItem) {
 }
 
 function renderCaseTable() {
+  if (!caseTableBody) return;
   var filtered = getFilteredCases();
   renderCaseSummaryCards(casesState);
-  caseEmpty.classList.toggle("hidden", filtered.length > 0);
+  if (caseEmpty) caseEmpty.classList.toggle("hidden", filtered.length > 0);
   caseTableBody.innerHTML = filtered.map(function(c) {
     var overdue = isOverdue(c);
     return '<tr class="' + (overdue ? "row-overdue" : "") + '">' +
@@ -1063,71 +1056,23 @@ if (saveRepresentativeButton) {
   });
 }
 
-exportExcelButton.addEventListener("click", async function() {
-  if (!supportsDesktopOnlyTools) {
+if (exportExcelButton) {
+  exportExcelButton.addEventListener("click", async function() {
     setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
-    return;
-  }
-  if (!casesState.length) {
-    setStorageMessage("No hay casos guardados para exportar.", "warn");
-    return;
-  }
-  try {
-    var result = await api.exportExcel(casesState);
-    if (result.ok) {
-      setStorageMessage("Excel exportado correctamente. Se ha abierto la carpeta.", "success");
-    } else if (result.reason !== "cancelled") {
-      setStorageMessage("No se pudo exportar el Excel: " + result.reason, "error");
-    }
-  } catch (err) {
-    setStorageMessage("Error al exportar: " + err.message, "error");
-  }
-});
+  });
+}
 
-backupButton.addEventListener("click", async function() {
-  if (!supportsDesktopOnlyTools) {
+if (backupButton) {
+  backupButton.addEventListener("click", async function() {
     setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
-    return;
-  }
-  try {
-    var result = await api.backupDatabase();
-    if (!result || !result.ok) {
-      if (result && result.reason !== "cancelled") {
-        setStorageMessage("Error al crear la copia: " + result.reason, "error");
-      }
-      return;
-    }
-    setStorageMessage(t("msg.backup.saved.format").replace("{name}", fileNameFromPath(result.path)), "success");
-  } catch (err) {
-    setStorageMessage("Error al crear la copia: " + err.message, "error");
-  }
-});
+  });
+}
 
-restoreButton.addEventListener("click", async function() {
-  if (!supportsDesktopOnlyTools) {
+if (restoreButton) {
+  restoreButton.addEventListener("click", async function() {
     setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
-    return;
-  }
-  try {
-    var result = await api.restoreDatabase();
-    if (!result || !result.ok) {
-      if (result && result.reason !== "cancelled") {
-        setStorageMessage("Error al restaurar la copia: " + result.reason, "error");
-      }
-      return;
-    }
-    casesState = hydrateCases(await api.getCases());
-    clearCaseForm();
-    renderCaseTable();
-    var restoreMsg = t("msg.restore.done.format").replace("{name}", fileNameFromPath(result.path));
-    if (result.autoBackupPath) {
-      restoreMsg += " " + t("msg.restore.safeBackup.format").replace("{name}", fileNameFromPath(result.autoBackupPath));
-    }
-    setStorageMessage(restoreMsg, "success");
-  } catch (err) {
-    setStorageMessage("Error al restaurar la copia: " + err.message, "error");
-  }
-});
+  });
+}
 
 async function performSave(options) {
   var silent = options && options.silent;
@@ -1244,24 +1189,29 @@ copySummaryButton.addEventListener("click", async function() {
   }
 });
 
-caseSearchField.addEventListener("input", renderCaseTable);
-caseStatusFilterField.addEventListener("change", renderCaseTable);
+if (caseSearchField) caseSearchField.addEventListener("input", renderCaseTable);
+if (caseStatusFilterField) caseStatusFilterField.addEventListener("change", renderCaseTable);
 
-document.getElementById("urgent-filter-button").addEventListener("click", function() {
-  urgentFilterActive = !urgentFilterActive;
-  this.classList.toggle("active", urgentFilterActive);
-  renderCaseTable();
-});
+var urgentFilterButton = document.getElementById("urgent-filter-button");
+if (urgentFilterButton) {
+  urgentFilterButton.addEventListener("click", function() {
+    urgentFilterActive = !urgentFilterActive;
+    this.classList.toggle("active", urgentFilterActive);
+    renderCaseTable();
+  });
+}
 
-caseTableBody.addEventListener("click", function(event) {
-  var button = event.target.closest("[data-case-id]");
-  if (!button) return;
-  var caseItem = casesState.find(function(c) { return c.id === button.dataset.caseId; });
-  if (caseItem) {
-    populateCaseForm(caseItem);
-    setStorageMessage(t("msg.editing.format").replace("{id}", caseItem.id), "info");
-  }
-});
+if (caseTableBody) {
+  caseTableBody.addEventListener("click", function(event) {
+    var button = event.target.closest("[data-case-id]");
+    if (!button) return;
+    var caseItem = casesState.find(function(c) { return c.id === button.dataset.caseId; });
+    if (caseItem) {
+      populateCaseForm(caseItem);
+      setStorageMessage(t("msg.editing.format").replace("{id}", caseItem.id), "info");
+    }
+  });
+}
 
 // Lang toggle
 

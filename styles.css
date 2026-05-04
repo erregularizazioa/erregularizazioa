@@ -102,6 +102,10 @@ img {
   gap: 18px;
 }
 
+.captcha-shell {
+  min-height: 65px;
+}
+
 .auth-actions {
   margin-top: 8px;
 }

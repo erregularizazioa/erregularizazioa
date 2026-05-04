@@ -7,7 +7,6 @@ const APP_URL = pathToFileURL(path.join(__dirname, "..", "..", "index.html")).hr
 async function openApp(page, options = {}) {
   await page.addInitScript((initOptions) => {
     const cases = [...(initOptions.cases || [])];
-    const restoredCases = [...(initOptions.restoreCases || [])];
     const representatives = [...(initOptions.representatives || [])];
 
     window.__copiedText = "";
@@ -37,13 +36,7 @@ async function openApp(page, options = {}) {
         else cases.push(saved);
         return saved;
       },
-      getNextId: async () => "REG-2026-00001",
-      exportExcel: async () => ({ ok: true }),
-      backupDatabase: async () => ({ ok: true, path: "/tmp/regularizazioa-backup.db" }),
-      restoreDatabase: async () => {
-        cases.splice(0, cases.length, ...restoredCases);
-        return { ok: true, path: "/tmp/regularizazioa-backup.db", cases: restoredCases };
-      }
+      getNextId: async () => "REG-2026-00001"
     };
   }, options);
 
@@ -61,7 +54,7 @@ test("saves a case and shows the generated ID", async ({ page }) => {
   await page.getByRole("button", { name: /guardar caso/i }).click();
 
   await expect(page.locator("#case-id-preview")).toContainText("REG-2026-00001");
-  await expect(page.locator("#case-table-body")).toContainText("Persona E2E");
+  await expect(page.locator("#storage-message")).toContainText("REG-2026-00001");
 });
 
 test("saved representatives can be reused in another case", async ({ page }) => {
@@ -87,13 +80,13 @@ test("loads a read-only static mode when Electron is unavailable", async ({ page
   await openStaticApp(page);
 
   await expect(page.locator("#runtime-mode-message")).toBeVisible();
-  await expect(page.locator("#cases-panel")).toBeHidden();
+  await expect(page.locator("#cases-panel")).toHaveCount(0);
   await expect(page.locator("#save-case-button")).toBeHidden();
 
   await page.locator("#case-name").fill("Consulta publica");
   await page.locator("#case-form").evaluate((form) => form.requestSubmit());
 
-  await expect(page.locator("#storage-message")).toContainText(/solo de consulta|lecture seule/i);
+  await expect(page.locator("#storage-message")).toContainText(/no guarda datos|n.enregistre pas/i);
   await expect(page.locator("#case-id-preview")).toHaveText("");
 });
 
@@ -166,79 +159,4 @@ test("autosave persists the case after leaving the name field", async ({ page })
   await page.locator("#case-phone").click();
 
   await expect(page.locator("#case-id-preview")).toContainText("REG-2026-00001", { timeout: 3000 });
-  await expect(page.locator("#case-table-body")).toContainText("Persona Autosave E2E");
-});
-
-test("summary row renders as compact pills", async ({ page }) => {
-  await openApp(page, {
-    cases: [{ id: "REG-2026-00001", caseName: "Persona", caseStatus: "Nuevo", nextAction: "Llamar", locality: "Bergara" }]
-  });
-
-  await expect(page.locator(".summary-pill")).toHaveCount(6);
-  await expect(page.locator(".summary-card")).toHaveCount(0);
-});
-
-test("backup button shows success message", async ({ page }) => {
-  await openApp(page);
-
-  await page.locator("#backup-button").click();
-  await expect(page.locator("#storage-message")).toContainText(/Copia de seguridad guardada/i);
-});
-
-test("restore button reloads the restored cases", async ({ page }) => {
-  await openApp(page, {
-    cases: [{ id: "REG-2026-00001", caseName: "Antes", caseStatus: "Nuevo", locality: "Bergara" }],
-    restoreCases: [{ id: "REG-2026-00002", caseName: "Despues", caseStatus: "Nuevo", locality: "Bilbao" }]
-  });
-
-  await expect(page.locator("#case-table-body")).toContainText("Antes");
-  await page.locator("#restore-button").click();
-
-  await expect(page.locator("#storage-message")).toContainText(/Base de datos restaurada/i);
-  await expect(page.locator("#case-table-body")).toContainText("Despues");
-  await expect(page.locator("#case-table-body")).not.toContainText("Antes");
-});
-
-test("urgent filter keeps only overdue cases in the table", async ({ page }) => {
-  await openApp(page, {
-    cases: [
-      { id: "REG-2026-00001", caseName: "Vencido", caseStatus: "Nuevo", nextDate: "2026-04-01", nextAction: "Llamar hoy", locality: "Bergara" },
-      { id: "REG-2026-00002", caseName: "Pendiente", caseStatus: "Nuevo", nextDate: "2026-05-10", nextAction: "Esperar cita", locality: "Bergara" }
-    ]
-  });
-
-  await expect(page.locator("#case-table-body tr")).toHaveCount(2);
-  await page.locator("#urgent-filter-button").click();
-
-  await expect(page.locator("#case-table-body tr")).toHaveCount(1);
-  await expect(page.locator("#case-table-body")).toContainText("Vencido");
-  await expect(page.locator("#case-table-body")).not.toContainText("Pendiente");
-});
-
-test("editing a saved case loads its data back into the form", async ({ page }) => {
-  await openApp(page, {
-    cases: [
-      {
-        id: "REG-2026-00033",
-        caseName: "Caso Editar",
-        phone: "612345678",
-        email: "editar@example.org",
-        locality: "Bergara",
-        volunteer: "Ane",
-        caseStatus: "Reuniendo documentos",
-        nextDate: "2026-05-01",
-        nextAction: "Pedir certificado",
-        notes: "Caso de prueba",
-        route: "Situacion administrativa irregular",
-        answers: { personType: "adult", validPermit: "no", ukraineProtection: "no", stateless: "no", pendingApplication: "no", beforeJan2026: "yes", fiveMonths: "yes", identityDocument: "yes", criminalRecord: "yes", piBefore2026: "no", irregularOptions: ["work"] },
-        checks: {}
-      }
-    ]
-  });
-
-  await page.getByRole("button", { name: /editar/i }).click();
-
-  await expect(page.locator("#case-id-preview")).toContainText("REG-2026-00033");
-  await expect(page.locator("#case-name")).toHaveValue("Caso Editar");
-  await expect(page.locator("#case-next-action")).toHaveValue("Pedir certificado");
 });

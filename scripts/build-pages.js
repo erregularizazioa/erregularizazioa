@@ -35,6 +35,9 @@ function injectPrivateShell(appHtml) {
         '        <span>Contraseña</span>',
         '        <input id="login-password" type="password" placeholder="Tu contraseña" autocomplete="current-password" required>',
         '      </label>',
+        '      <div id="captcha-shell" class="captcha-shell hidden">',
+        '        <div id="login-captcha"></div>',
+        '      </div>',
         '      <div class="actions auth-actions">',
         '        <button type="submit">Entrar</button>',
         '        <a class="secondary-link" href="./">Volver a la página pública</a>',
@@ -64,6 +67,7 @@ function injectPrivateShell(appHtml) {
       '  <script src="translations.js"></script>\n  <script src="logic.js"></script>\n  <script src="app.js"></script>',
       [
         '  <script src="config.js"></script>',
+        '  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>',
         '  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>',
         '  <script src="translations.js"></script>',
         '  <script src="logic.js"></script>',
@@ -91,11 +95,10 @@ async function main() {
   }));
 
   const appHtml = await fs.promises.readFile(path.join(ROOT_DIR, "index.html"), "utf8");
-  const publicHtml = await fs.promises.readFile(path.join(ROOT_DIR, "pages", "public-index.html"), "utf8");
   const privateHtml = injectPrivateShell(appHtml);
 
   await Promise.all([
-    fs.promises.writeFile(path.join(OUTPUT_DIR, "index.html"), publicHtml),
+    fs.promises.writeFile(path.join(OUTPUT_DIR, "index.html"), appHtml),
     fs.promises.writeFile(path.join(OUTPUT_DIR, "simulador.html"), appHtml),
     fs.promises.writeFile(path.join(OUTPUT_DIR, "private.html"), privateHtml)
   ]);

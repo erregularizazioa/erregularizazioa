@@ -20,7 +20,7 @@
       <h1 data-i18n="hero.h1">Ficha unica de caso</h1>
       <p id="hero-intro" class="intro" data-i18n="hero.intro">
         Aqui se rellena todo en un solo sitio: datos del caso, analisis, documentacion, pasos y seguimiento.
-        Los datos se guardan en una base de datos local en tu ordenador. Puedes exportar a Excel cuando quieras.
+        La version publica no guarda datos: sirve para revisar la orientacion, imprimir o copiar el resumen.
       </p>
       <div id="runtime-mode-message" class="notice info hidden" role="status" data-i18n="static.banner">
         Esta version publica solo muestra el simulador y la orientacion. No guarda casos ni exporta datos.
@@ -428,67 +428,6 @@
           <span id="autosave-indicator" class="autosave-indicator"></span>
         </div>
       </form>
-    </section>
-
-    <section id="cases-panel" class="panel">
-      <div class="section-heading">
-        <div>
-          <h2 data-i18n="cases.heading">Casos guardados</h2>
-          <p class="note" data-i18n="cases.note">Busca por ID, nombre, telefono, voluntariado o localidad.</p>
-        </div>
-        <div class="toolbar">
-          <button type="button" id="backup-button" class="secondary" data-i18n="btn.backup">Copia</button>
-          <button type="button" id="restore-button" class="secondary" data-i18n="btn.restore">Restaurar</button>
-          <button type="button" id="export-excel-button" class="secondary" data-i18n="btn.excel">Exportar a Excel</button>
-        </div>
-      </div>
-      <div id="case-summary" class="summary-grid"></div>
-
-      <div class="filters">
-        <label class="field">
-          <span data-i18n="search.label">Buscar</span>
-          <input id="case-search" type="search" data-i18n-placeholder="search.placeholder" placeholder="REG-2026-00001 / nombre / telefono">
-        </label>
-
-        <label class="field">
-          <span data-i18n="filter.label">Filtrar por estado</span>
-          <select id="case-status-filter">
-            <option value="" data-i18n="status.filter.all">Todos</option>
-            <option value="Nuevo" data-i18n="status.new">Nuevo</option>
-            <option value="Reuniendo documentos" data-i18n="status.gathering">Reuniendo documentos</option>
-            <option value="Lista para presentar" data-i18n="status.ready">Lista para presentar</option>
-            <option value="Presentada" data-i18n="status.submitted">Presentada</option>
-            <option value="Inicio recibido" data-i18n="status.started">Inicio recibido</option>
-            <option value="Favorable" data-i18n="status.favorable">Favorable</option>
-            <option value="Desfavorable" data-i18n="status.unfavorable">Desfavorable</option>
-            <option value="Cerrada" data-i18n="status.closed">Cerrada</option>
-          </select>
-        </label>
-
-        <button type="button" id="urgent-filter-button" class="secondary urgent-filter-btn" data-i18n="filter.urgent">Solo urgentes</button>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th data-i18n="table.id">ID</th>
-              <th data-i18n="table.person">Persona</th>
-              <th data-i18n="table.route">Ruta</th>
-              <th data-i18n="table.status">Estado</th>
-              <th data-i18n="table.presentation">Presentacion</th>
-              <th data-i18n="table.nextDate">Proxima cita</th>
-              <th data-i18n="table.nextStep">Proximo paso</th>
-              <th data-i18n="table.volunteer">Voluntariado</th>
-              <th data-i18n="table.updated">Actualizado</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="case-table-body"></tbody>
-        </table>
-      </div>
-
-      <p id="case-empty" class="empty-state" data-i18n="table.empty">Todavia no hay casos guardados.</p>
     </section>
 
     <section class="panel">
