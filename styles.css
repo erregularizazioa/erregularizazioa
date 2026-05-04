@@ -107,6 +107,14 @@ h2 {
   font-size: 1.1rem;
 }
 
+.hero-description {
+  max-width: 760px;
+  margin: 14px 0 0;
+  color: var(--ink);
+  font-size: 1.18rem;
+  font-weight: 650;
+}
+
 .lang-toggle {
   display: inline-flex;
   gap: 6px;

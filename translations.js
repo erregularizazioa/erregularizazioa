@@ -5,6 +5,7 @@
       ui: {
         "hero.eyebrow": "Regularización extraordinaria 2026",
         "hero.h1": "Pedir ayuda con la regularización",
+        "hero.description": "Somos un grupo de personas voluntarias que acompaña a quienes quieren regularizar su situación durante este proceso extraordinario.",
         "hero.intro.publicSubmit": "Rellena esta ficha para que el equipo pueda revisar tu situación y ponerse en contacto contigo.",
         "publicSubmit.banner": "La información que envíes se guardará de forma privada. No se muestra públicamente.",
         "form.heading": "Datos de contacto",
@@ -68,6 +69,7 @@
       ui: {
         "hero.eyebrow": "Régularisation extraordinaire 2026",
         "hero.h1": "Demander de l’aide pour la régularisation",
+        "hero.description": "Nous sommes un groupe de personnes bénévoles qui accompagne celles et ceux qui veulent régulariser leur situation pendant cette procédure extraordinaire.",
         "hero.intro.publicSubmit": "Remplissez cette fiche pour que l’équipe puisse examiner votre situation et vous contacter.",
         "publicSubmit.banner": "Les informations envoyées seront enregistrées de manière privée. Elles ne sont pas affichées publiquement.",
         "form.heading": "Coordonnées",
