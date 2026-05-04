@@ -20,10 +20,10 @@
       <h1 data-i18n="hero.h1">Ficha unica de caso</h1>
       <p id="hero-intro" class="intro" data-i18n="hero.intro">
         Aqui se rellena todo en un solo sitio: datos del caso, analisis, documentacion, pasos y seguimiento.
-        La version publica no guarda datos: sirve para revisar la orientacion, imprimir o copiar el resumen.
+        Al enviar la ficha, guardaremos la informacion para que el equipo pueda revisar el caso.
       </p>
       <div id="runtime-mode-message" class="notice info hidden" role="status" data-i18n="static.banner">
-        Esta version publica solo muestra el simulador y la orientacion. No guarda casos ni exporta datos.
+        La informacion que envies se guardara para que el equipo pueda revisar tu caso. No se muestra publicamente.
       </div>
     </header>
 
@@ -420,8 +420,12 @@
           </div>
         </fieldset>
 
+        <div id="captcha-shell" class="captcha-shell hidden">
+          <div id="submit-captcha"></div>
+        </div>
+
         <div class="actions">
-          <button id="save-case-button" type="submit" data-i18n="btn.save">Guardar caso</button>
+          <button id="save-case-button" type="submit" data-i18n="btn.save">Enviar solicitud</button>
           <button type="button" id="clear-case-button" class="secondary" data-i18n="btn.clear">Limpiar ficha</button>
           <button type="button" id="print-button" class="secondary" data-i18n="btn.print">Imprimir ficha</button>
           <button type="button" id="copy-summary-button" class="secondary" data-i18n="btn.copySummary">Copiar resumen</button>

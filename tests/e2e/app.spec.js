@@ -51,29 +51,10 @@ test("saves a case and shows the generated ID", async ({ page }) => {
   await openApp(page);
 
   await page.locator("#case-name").fill("Persona E2E");
-  await page.getByRole("button", { name: /guardar caso/i }).click();
+  await page.getByRole("button", { name: /enviar solicitud/i }).click();
 
   await expect(page.locator("#case-id-preview")).toContainText("REG-2026-00001");
   await expect(page.locator("#storage-message")).toContainText("REG-2026-00001");
-});
-
-test("saved representatives can be reused in another case", async ({ page }) => {
-  await openApp(page);
-
-  await page.locator("#representative-directory-panel summary").click();
-  await page.locator("#representative-directory-name").fill("Entidad amiga");
-  await page.locator("#representative-directory-phone").fill("600111222");
-  await page.locator("#representative-directory-email").fill("entidad@ejemplo.org");
-  await page.getByRole("button", { name: /guardar ficha|guardar representante/i }).click();
-
-  await expect(page.locator("#representative-directory-select")).toHaveValue("REP-00001");
-  await page.locator("#clear-case-button").click();
-  await page.locator("#case-representative-profile").selectOption("REP-00001");
-
-  await expect(page.locator("#case-representative-name")).toHaveValue("Entidad amiga");
-  await expect(page.locator("#case-representative-phone")).toHaveValue("600111222");
-  await expect(page.locator("#case-representative-email")).toHaveValue("entidad@ejemplo.org");
-  await expect(page.locator("#case-representative-name")).toHaveJSProperty("readOnly", true);
 });
 
 test("loads a read-only static mode when Electron is unavailable", async ({ page }) => {
@@ -105,7 +86,7 @@ test("invalid phone blocks save and shows inline error", async ({ page }) => {
 
   await page.locator("#case-name").fill("Persona Telefono");
   await page.locator("#case-phone").fill("12345");
-  await page.getByRole("button", { name: /guardar caso/i }).click();
+  await page.getByRole("button", { name: /enviar solicitud/i }).click();
 
   await expect(page.locator("#phone-error")).toBeVisible();
   await expect(page.locator("#storage-message")).toContainText(/telefono|email/i);
@@ -143,7 +124,7 @@ test("copy summary copies follow-up text to clipboard stub", async ({ page }) =>
   await openApp(page);
 
   await page.locator("#case-name").fill("Persona Seguimiento");
-  await page.getByRole("button", { name: /guardar caso/i }).click();
+  await page.getByRole("button", { name: /enviar solicitud/i }).click();
   await page.locator("#copy-summary-button").click();
 
   await expect(page.locator("#storage-message")).toContainText(/Resumen copiado|copie/i);

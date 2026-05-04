@@ -1,8 +1,8 @@
 # Regularizazioa 2026
 
-Formulario web publico para orientar casos de la regularizacion extraordinaria 2026 en Espana.
+Formulario web publico para recoger y orientar casos de la regularizacion extraordinaria 2026 en Espana.
 
-La pagina publica es estatica y no guarda datos. Sirve para rellenar la ficha, revisar la orientacion, imprimirla o copiar un resumen. El codigo es publico por diseno porque se publica en GitHub Pages.
+La pagina publica se publica en GitHub Pages, muestra una sola ficha y envia los datos a Supabase despues de validar Cloudflare Turnstile en una Edge Function. El codigo del navegador es publico por diseno.
 
 ## Desarrollo
 
@@ -18,9 +18,8 @@ npm test
 
 El build genera estas entradas:
 
-- `index.html` -> formulario publico completo, sin login ni guardado
+- `index.html` -> formulario publico completo con envio a Supabase
 - `simulador.html` -> alias del mismo formulario publico
-- `private.html` -> formulario privado con login de Supabase para el equipo
 
 Para publicarlo en `https://github.com/erregularizazioa/erregularizazioa/`:
 
@@ -38,17 +37,17 @@ https://erregularizazioa.github.io/erregularizazioa/
 
 GitHub Pages solo sirve archivos estaticos. No puede guardar secretos ni verificar CAPTCHA por si mismo.
 
-La pagina publica no escribe en ninguna base de datos, asi que no hay endpoint publico que proteger. La parte sensible es `private.html`: ahi la proteccion real depende de Supabase Auth, RLS y CAPTCHA verificado por Supabase.
+Por eso el navegador no escribe directamente en las tablas. El formulario llama a `public-submit`, una Supabase Edge Function que:
 
-Para activar CAPTCHA en el login privado:
+- verifica el token de Cloudflare Turnstile con `TURNSTILE_SECRET_KEY`
+- inserta el caso en Supabase con `SUPABASE_SERVICE_ROLE_KEY`
+- no expone datos guardados al publico
 
-1. Crea un widget de Cloudflare Turnstile para `erregularizazioa.github.io`.
-2. En Supabase, ve a **Authentication -> Bot and Abuse Protection**, activa CAPTCHA, elige Turnstile y pega el secret key.
-3. En `pages/config.js`, pega el site key publico en `captchaSiteKey`.
+La clave `captchaSiteKey` de `pages/config.js` es publica por diseno. La clave secreta de Turnstile no va en GitHub ni en JavaScript.
 
-La clave anon/publicable de Supabase en `pages/config.js` no es un secreto. Las tablas deben seguir protegidas con RLS.
+La clave anon/publicable de Supabase en `pages/config.js` tampoco es un secreto. Las tablas deben seguir protegidas con RLS y sin permisos `anon`.
 
-## Supabase Privado
+## Supabase
 
 Aplica el esquema:
 
@@ -62,7 +61,17 @@ O con conexion completa:
 SUPABASE_DB_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres" npm run supabase:apply
 ```
 
-Despues crea manualmente las cuentas autorizadas en **Authentication -> Users**.
+Despliega la Edge Function:
+
+```bash
+supabase functions deploy public-submit --project-ref fyvnthqkwoolfifnhdyu
+```
+
+Configura el secret de Turnstile en Supabase:
+
+```bash
+supabase secrets set TURNSTILE_SECRET_KEY="[SECRET]" --project-ref fyvnthqkwoolfifnhdyu
+```
 
 ## Estructura
 
@@ -74,9 +83,10 @@ Despues crea manualmente las cuentas autorizadas en **Authentication -> Users**.
 | `translations.js` | Textos ES/FR |
 | `styles.css` | Estilos |
 | `pages/config.js` | Configuracion publica de Supabase y CAPTCHA |
-| `pages/supabase-web.js` | Login y guardado privado con Supabase |
+| `pages/public-submit.js` | Envio publico con Turnstile |
 | `scripts/build-pages.js` | Genera `dist/pages/` |
 | `supabase/schema.sql` | Esquema y politicas RLS |
+| `supabase/functions/public-submit/` | Edge Function que verifica CAPTCHA e inserta casos |
 
 ## Aviso
 

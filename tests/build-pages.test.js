@@ -7,7 +7,7 @@ const { execFileSync } = require("child_process");
 const ROOT = path.resolve(__dirname, "..");
 const OUTPUT = path.join(ROOT, "dist", "pages");
 
-test("build-pages generates public form and private web entries", () => {
+test("build-pages generates public submit form", () => {
   execFileSync("node", [path.join(ROOT, "scripts", "build-pages.js")], {
     cwd: ROOT,
     stdio: "pipe"
@@ -15,19 +15,19 @@ test("build-pages generates public form and private web entries", () => {
 
   const publicHtml = fs.readFileSync(path.join(OUTPUT, "index.html"), "utf8");
   const simulatorHtml = fs.readFileSync(path.join(OUTPUT, "simulador.html"), "utf8");
-  const privateHtml = fs.readFileSync(path.join(OUTPUT, "private.html"), "utf8");
   const configJs = fs.readFileSync(path.join(OUTPUT, "config.js"), "utf8");
   const logoPath = path.join(OUTPUT, "assets", "sindicato-socialista-vivienda.png");
 
   assert.match(publicHtml, /id="case-form"/);
+  assert.match(publicHtml, /public-submit\.js/);
+  assert.match(publicHtml, /challenges\.cloudflare\.com\/turnstile/);
+  assert.match(publicHtml, /id="submit-captcha"/);
   assert.doesNotMatch(publicHtml, /public-landing/);
   assert.match(simulatorHtml, /id="case-form"/);
-  assert.match(privateHtml, /id="auth-shell"/);
-  assert.match(privateHtml, /id="login-captcha"/);
-  assert.match(privateHtml, /challenges\.cloudflare\.com\/turnstile/);
-  assert.match(privateHtml, /supabase-web\.js/);
-  assert.match(privateHtml, /assets\/sindicato-socialista-vivienda\.png/);
   assert.match(configJs, /captchaSiteKey/);
+  assert.match(configJs, /0x4AAAAAADIwsa3zmnhOfgGb/);
+  assert.match(configJs, /submitFunctionUrl/);
   assert.match(configJs, /REGULARIZAZIOA_SUPABASE_CONFIG/);
   assert.equal(fs.existsSync(logoPath), true);
+  assert.equal(fs.existsSync(path.join(OUTPUT, "private.html")), false);
 });

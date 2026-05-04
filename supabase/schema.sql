@@ -55,6 +55,8 @@ $$;
 grant execute on function public.next_case_id() to authenticated;
 grant select, insert, update, delete on public.app_cases to authenticated;
 grant select, insert, update, delete on public.app_representatives to authenticated;
+revoke all on public.app_cases from anon;
+revoke all on public.app_representatives from anon;
 
 drop policy if exists "authenticated can read cases" on public.app_cases;
 create policy "authenticated can read cases"

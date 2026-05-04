@@ -1,11 +1,11 @@
 const logic = window.RegularizacionLogic;
 const T = window.TRANSLATIONS;
 const runtimeConfig = window.REGULARIZAZIOA_APP_CONFIG || {};
-const appMode = runtimeConfig.mode === "static" || runtimeConfig.mode === "web-private"
+const appMode = runtimeConfig.mode === "static" || runtimeConfig.mode === "public-submit"
   ? runtimeConfig.mode
-  : (window.electronAPI ? "web-private" : "static");
+  : (window.electronAPI ? "public-submit" : "static");
 const isStaticMode = appMode === "static";
-const isWebPrivateMode = appMode === "web-private";
+const isPublicSubmitMode = appMode === "public-submit";
 const supportsCaseStorage = !isStaticMode;
 const electronApi = !isStaticMode && window.electronAPI ? window.electronAPI : null;
 const api = {
@@ -24,6 +24,9 @@ const api = {
   saveCase: electronApi && typeof electronApi.saveCase === "function"
     ? electronApi.saveCase.bind(electronApi)
     : async function() { throw new Error("read-only"); },
+  prepareSave: electronApi && typeof electronApi.prepareSave === "function"
+    ? electronApi.prepareSave.bind(electronApi)
+    : null,
   exportExcel: async function() { throw new Error("read-only"); },
   backupDatabase: async function() { throw new Error("read-only"); },
   restoreDatabase: async function() { throw new Error("read-only"); }
@@ -120,12 +123,12 @@ function tResult(code) {
 
 function applyRuntimeText() {
   if (heroIntro) {
-    heroIntro.textContent = isStaticMode ? t("hero.intro.static") : (isWebPrivateMode ? t("hero.intro.private") : t("hero.intro"));
+    heroIntro.textContent = isStaticMode ? t("hero.intro.static") : (isPublicSubmitMode ? t("hero.intro.publicSubmit") : t("hero.intro"));
   }
 
   if (runtimeModeMessage) {
-    runtimeModeMessage.textContent = isStaticMode ? t("static.banner") : t("private.banner");
-    runtimeModeMessage.classList.toggle("hidden", !(isStaticMode || isWebPrivateMode));
+    runtimeModeMessage.textContent = isStaticMode ? t("static.banner") : t("publicSubmit.banner");
+    runtimeModeMessage.classList.toggle("hidden", !(isStaticMode || isPublicSubmitMode));
   }
 }
 
@@ -193,6 +196,11 @@ function applyRuntimeMode() {
       caseIdPreview.classList.add("hidden");
     }
     if (casesPanel) casesPanel.classList.add("hidden");
+  }
+
+  if (isPublicSubmitMode) {
+    if (representativeDirectoryPanel) representativeDirectoryPanel.classList.add("hidden");
+    if (autosaveIndicator) autosaveIndicator.classList.add("hidden");
   }
 
   if (backupButton) backupButton.classList.add("hidden");
@@ -1041,7 +1049,7 @@ if (newRepresentativeButton) {
 
 if (saveRepresentativeButton) {
   saveRepresentativeButton.addEventListener("click", async function() {
-    if (!supportsCaseStorage) {
+    if (!supportsCaseStorage || isPublicSubmitMode) {
       setStorageMessage(t("msg.static.readOnly"), "info");
       return;
     }
@@ -1058,19 +1066,19 @@ if (saveRepresentativeButton) {
 
 if (exportExcelButton) {
   exportExcelButton.addEventListener("click", async function() {
-    setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
+    setStorageMessage(t("msg.static.readOnly"), "info");
   });
 }
 
 if (backupButton) {
   backupButton.addEventListener("click", async function() {
-    setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
+    setStorageMessage(t("msg.static.readOnly"), "info");
   });
 }
 
 if (restoreButton) {
   restoreButton.addEventListener("click", async function() {
-    setStorageMessage(isStaticMode ? t("msg.static.readOnly") : t("msg.private.desktopOnly"), "info");
+    setStorageMessage(t("msg.static.readOnly"), "info");
   });
 }
 
@@ -1126,6 +1134,9 @@ async function performSave(options) {
   }));
 
   try {
+    if (api.prepareSave) {
+      await api.prepareSave({ silent: silent });
+    }
     var saved = await api.saveCase(caseData);
     casesState = hydrateCases(await api.getCases());
     renderCaseTable();

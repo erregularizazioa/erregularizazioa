@@ -208,32 +208,6 @@ test("form keeps presentation prep fields after save", async () => {
   assert.equal(document.getElementById("case-presentation-registry-number").value, "REGISTRO-123");
 });
 
-test("representative profiles can be saved and reused from the form", async () => {
-  const { window, document, appLoadError } = await buildDOM();
-
-  if (appLoadError) {
-    throw new Error("Skipped because app.js failed to load: " + appLoadError.message);
-  }
-
-  document.getElementById("representative-directory-name").value = "Entidad amiga";
-  document.getElementById("representative-directory-phone").value = "600111222";
-  document.getElementById("representative-directory-email").value = "entidad@ejemplo.org";
-  document.getElementById("save-representative-button").click();
-  await new Promise((r) => setTimeout(r, 100));
-
-  assert.equal(document.getElementById("representative-directory-select").value, "REP-00001");
-  assert.match(document.getElementById("storage-message").textContent, /Entidad amiga/);
-
-  document.getElementById("clear-case-button").click();
-  document.getElementById("case-representative-profile").value = "REP-00001";
-  document.getElementById("case-representative-profile").dispatchEvent(new window.Event("change", { bubbles: true }));
-
-  assert.equal(document.getElementById("case-representative-name").value, "Entidad amiga");
-  assert.equal(document.getElementById("case-representative-phone").value, "600111222");
-  assert.equal(document.getElementById("case-representative-email").value, "entidad@ejemplo.org");
-  assert.equal(document.getElementById("case-representative-name").readOnly, true);
-});
-
 test("linked representative data is refreshed when choosing a saved representative", async () => {
   const { document, appLoadError } = await buildDOM({
     representatives: [{
