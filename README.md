@@ -1,8 +1,10 @@
 # Regularizazioa 2026
 
-Formulario web publico para recoger y orientar casos de la regularizacion extraordinaria 2026 en Espana.
+Formulario web publico para recoger solicitudes de ayuda sobre la regularizacion extraordinaria 2026 en Espana.
 
-La pagina publica se publica en GitHub Pages, muestra una sola ficha y envia los datos a Supabase despues de validar Cloudflare Turnstile en una Edge Function. El codigo del navegador es publico por diseno.
+La pagina publica se publica en GitHub Pages, muestra una ficha ligera pensada para que la rellene directamente la persona interesada y envia los datos a Supabase despues de validar Cloudflare Turnstile en una Edge Function. El codigo del navegador es publico por diseno.
+
+La logica completa de orientacion sigue en `logic.js` y sus tests, pero no se carga en la pagina publica. Queda disponible para un uso interno o local posterior sin hacer pesado el formulario publico.
 
 ## Desarrollo
 
@@ -77,13 +79,12 @@ supabase secrets set TURNSTILE_SECRET_KEY="[SECRET]" --project-ref fyvnthqkwoolf
 
 | Fichero / Carpeta | Descripcion |
 |---|---|
-| `index.html` | Formulario y orientacion principal |
-| `app.js` | Controlador de UI |
-| `logic.js` | Logica pura de elegibilidad y checklists |
+| `index.html` | Formulario publico ligero |
+| `app.js` | Controlador del formulario publico y envio |
+| `logic.js` | Logica pura de elegibilidad y checklists, reservada para uso interno/local |
 | `translations.js` | Textos ES/FR |
 | `styles.css` | Estilos |
 | `pages/config.js` | Configuracion publica de Supabase y CAPTCHA |
-| `pages/public-submit.js` | Envio publico con Turnstile |
 | `scripts/build-pages.js` | Genera `dist/pages/` |
 | `supabase/schema.sql` | Esquema y politicas RLS |
 | `supabase/functions/public-submit/` | Edge Function que verifica CAPTCHA e inserta casos |

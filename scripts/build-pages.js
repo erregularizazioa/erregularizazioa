@@ -5,12 +5,10 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const OUTPUT_DIR = path.join(ROOT_DIR, "dist", "pages");
 const SHARED_PATHS_TO_COPY = [
   "app.js",
-  "logic.js",
   "translations.js",
   "styles.css",
   "pages/config.js",
   "pages/favicon.ico",
-  "pages/public-submit.js",
   "pages/assets"
 ];
 
@@ -33,13 +31,11 @@ async function main() {
 
   const appHtml = await fs.promises.readFile(path.join(ROOT_DIR, "index.html"), "utf8");
   const publicSubmitHtml = appHtml.replace(
-    '  <script src="translations.js"></script>\n  <script src="logic.js"></script>\n  <script src="app.js"></script>',
+    '  <script src="translations.js"></script>\n  <script src="app.js"></script>',
     [
       '  <script src="config.js"></script>',
       '  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>',
       '  <script src="translations.js"></script>',
-      '  <script src="logic.js"></script>',
-      '  <script src="public-submit.js"></script>',
       '  <script src="app.js"></script>'
     ].join("\n")
   );

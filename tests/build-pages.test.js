@@ -19,9 +19,10 @@ test("build-pages generates public submit form", () => {
   const logoPath = path.join(OUTPUT, "assets", "sindicato-socialista-vivienda.png");
 
   assert.match(publicHtml, /id="case-form"/);
-  assert.match(publicHtml, /public-submit\.js/);
   assert.match(publicHtml, /challenges\.cloudflare\.com\/turnstile/);
   assert.match(publicHtml, /id="submit-captcha"/);
+  assert.match(publicHtml, /id="privacy-consent"/);
+  assert.doesNotMatch(publicHtml, /logic\.js/);
   assert.doesNotMatch(publicHtml, /public-landing/);
   assert.match(simulatorHtml, /id="case-form"/);
   assert.match(configJs, /captchaSiteKey/);
